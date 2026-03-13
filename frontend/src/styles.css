@@ -1,0 +1,16 @@
+body {
+  background: #000;
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+}
+
+button {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+button:hover {
+  background: #fff;
+  color: #000;
+}
