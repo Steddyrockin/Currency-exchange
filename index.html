@@ -1,14 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Currency exchange</title>
-    <script type="module" crossorigin src="/assets/index-B4nokm2x.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DY7i8ruX.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Currency Exchange</title>
+    <link rel="stylesheet" href="styles.css"/>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LOGIN SECTION -->
+    <div class="card">
+        <h1>CURRENCY EXCHANGE</h1>
+
+        <input type="text" placeholder="Username" />
+        <input type="password" placeholder="Password" />
+
+        <button>LOGIN</button>
+    </div>
+
+    <!-- CONVERTER SECTION -->
+    <div class="card">
+        <h2>Converter</h2>
+
+        <label>From</label>
+        <select>
+            <option>USD</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>JPY</option>
+            <option>AUD</option>
+            <option>CAD</option>
+            <option>CHF</option>
+            <option>CNY</option>
+            <option>INR</option>
+            <option>All Currencies...</option>
+        </select>
+
+        <label>To</label>
+        <select>
+            <option>EUR</option>
+            <option>USD</option>
+            <option>GBP</option>
+            <option>JPY</option>
+            <option>All Currencies...</option>
+        </select>
+
+        <input type="number" placeholder="Amount" />
+
+        <button>CONVERT</button>
+    </div>
+
+</div>
