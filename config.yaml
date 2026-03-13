@@ -1,0 +1,17 @@
+trading:
+
+  capital: 10000
+  risk_per_trade: 0.01
+  max_drawdown: 0.10
+
+signals:
+
+  price_trigger: 0.01
+  volatility_threshold: 0.005
+
+pairs:
+
+  - EURUSD
+  - GBPUSD
+  - USDJPY
+  - AUDUSD
