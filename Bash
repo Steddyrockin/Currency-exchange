@@ -2,5 +2,5 @@ git init
 git add .
 git commit -m "Unified Currency Exchange Platform"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/currency-exchange-platform.git
+git remote add origin https://github.com/steddyrockin/currency-exchange-platform.git
 git push -u origin main
