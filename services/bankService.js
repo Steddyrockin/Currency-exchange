@@ -1,11 +1,12 @@
-// services/bankService.js
+// services/profitService.js
 
-async function sendToBank(amount) {
-
-  // Integrate Stripe/Dwolla/Plaid here
-  console.log(`Transferring $${amount} to bank account`);
-
-  return { success: true };
+function calculateProfit(before, after) {
+  return after - before;
 }
 
-module.exports = { sendToBank };
+function calculatePayout(profit) {
+  if (profit <= 0) return 0;
+  return profit * 0.30;
+}
+
+module.exports = { calculateProfit, calculatePayout };
