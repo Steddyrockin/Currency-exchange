@@ -1,4 +1,4 @@
-ai-forex-engine/
+currency-exchange-platform/
 
 README.md
 requirements.txt
