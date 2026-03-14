@@ -1,24 +1,34 @@
-// services/profitService.js
+const cron = require("node-cron");
+const { calculateDailyProfit, calculatePayout } = require("./profitService");
+const { sendToBank } = require("./bankService");
+const Trade = require("../models/trade");
 
-async function calculateDailyProfit(trades) {
+// run every day at 11:59 PM
+cron.schedule("59 23 * * *", async () => {
 
-  let profit = 0;
+  console.log("Running daily payout process");
 
-  trades.forEach(trade => {
-    profit += trade.profit;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const trades = await Trade.find({
+    createdAt: { $gte: today }
   });
 
-  return profit;
-}
+  const profit = await calculateDailyProfit(trades);
 
-function calculatePayout(profit) {
+  const payout = calculatePayout(profit);
 
-  if (profit <= 0) return 0;
+  if (payout > 0) {
 
-  return profit * 0.30; // always 30%
-}
+    await sendToBank(payout);
 
-module.exports = {
-  calculateDailyProfit,
-  calculatePayout
-};
+    console.log(`30% payout sent: $${payout}`);
+
+  } else {
+
+    console.log("No profit today. No payout sent.");
+
+  }
+
+});
