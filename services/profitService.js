@@ -1,11 +1,10 @@
-// backend/services/profitService.js
-
-function calculateProfit(balanceBefore, balanceAfter) {
-  return balanceAfter - balanceBefore;
+function calculateProfit(before, after) {
+  return after - before;
 }
 
 function calculatePayout(profit) {
-  return profit * 0.30; // 30%
+  if (profit <= 0) return 0;
+  return profit * 0.30;
 }
 
 module.exports = { calculateProfit, calculatePayout };
