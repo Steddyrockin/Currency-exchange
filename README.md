@@ -1,5 +1,3 @@
-currency-exchange-platform/
-│
 ├── README.md
 ├── LICENSE
 ├── .gitignore
