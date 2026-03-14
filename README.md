@@ -1,67 +1,35 @@
-currency-exchange-platform/
-│
-├── README.md
-├── LICENSE
-├── .gitignore
-├── .env.example
-│
-├── frontend/
-│   ├── package.json
-│   ├── public/
-│   └── src/
-│       ├── index.js
-│       ├── App.js
-│       │
-│       ├── components/
-│       │   ├── Login/
-│       │   │   ├── Login.js
-│       │   │   └── Login.css
-│       │   │
-│       │   ├── Dashboard/
-│       │   │   ├── Dashboard.js
-│       │   │   └── Dashboard.css
-│       │   │
-│       │   ├── Converter/
-│       │   │   ├── CurrencyConverter.js
-│       │   │
-│       │   └── Market/
-│       │       ├── MarketOverview.js
-│       │
-│       ├── services/
-│       │   ├── api.js
-│       │   ├── auth.js
-│       │   └── exchangeRates.js
-│       │
-│       └── styles/
-│           └── global.css
-│
-├── backend/
-│   ├── server.js
-│   ├── package.json
-│   │
-│   ├── config/
-│   │   └── db.js
-│   │
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   └── currencyRoutes.js
-│   │
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   └── currencyController.js
-│   │
-│   ├── middleware/
-│   │   └── authMiddleware.js
-│   │
-│   └── services/
-│       └── exchangeService.js
-│
-├── ai-engine/
-│   ├── app.py
-│   ├── requirements.txt
-│   ├── models/
-│   │   ├── lstm.py
-│   │   └── volatility.py
-│   └── signal_engine.py
-│
-└── docker-compose.yml
+# Currency Exchange Platform
+
+A black-and-white currency exchange system supporting all global currencies.
+
+Features:
+- JWT Authentication
+- Live Exchange Rates
+- All Currency Pairs
+- Real-Time Updates
+- AI Signal Engine (LSTM-ready)
+- Clean Terminal UI
+
+## Tech Stack
+Frontend: React
+Backend: Node.js + Express
+AI Engine: Python (FastAPI)
+Database: MongoDB or PostgreSQL
+Deployment: Docker-ready
+
+## Installation
+
+### Backend
+cd backend
+npm install
+npm start
+
+### Frontend
+cd frontend
+npm install
+npm start
+
+### AI Engine
+cd ai-engine
+pip install -r requirements.txt
+uvicorn app:app --reload
