@@ -1,3 +1,5 @@
+# ai/signalEngine.py
+
 def generate_signal(current_price, predicted_price):
 
     threshold = 0.01
