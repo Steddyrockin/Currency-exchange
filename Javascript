@@ -1,6 +1,0 @@
-const router = require("express").Router();
-const { getRate } = require("../controllers/currencyController");
-
-router.get("/rate", getRate);
-
-module.exports = router;
