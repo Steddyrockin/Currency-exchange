@@ -1,3 +1,5 @@
+ai/signalEngine.py
+
 MAX_LOSS = 0.01
 PROFIT_THRESHOLD = 0.01
 
