@@ -1,5 +1,3 @@
-// services/bankService.js
-
 async function sendToBank(amount) {
 
   // Integrate Stripe/Dwolla/Plaid here
