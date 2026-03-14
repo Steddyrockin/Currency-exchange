@@ -1,3 +1,5 @@
+// services/profitService.js
+
 function calculateProfit(before, after) {
   return after - before;
 }
