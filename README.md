@@ -1,5 +1,3 @@
-currency-exchange-platform/
-
 README.md
 requirements.txt
 config.yaml
