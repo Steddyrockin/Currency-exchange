@@ -1,6 +1,6 @@
 # Currency Exchange Platform
 
-A black-and-white currency exchange system supporting all global currencies.
+A currency exchange system supporting all global currencies.
 
 Features:
 - JWT Authentication
