@@ -1,53 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Currency Exchange</title>
-<link rel="stylesheet" href="styles.css">
+<title>AI Forex Engine</title>
+
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    background:black;
+    color:white;
+    font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
+    padding:40px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+h1{
+    font-size:28px;
+    letter-spacing:2px;
+    border-bottom:1px solid white;
+    padding-bottom:10px;
+}
+
+table{
+    width:100%;
+    margin-top:30px;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:12px;
+    text-align:left;
+    border-bottom:1px solid white;
+}
+
+.signal-buy{
+    color:white;
+    background:black;
+    border:1px solid white;
+    padding:4px 8px;
+}
+
+.signal-hold{
+    opacity:.6;
+}
+
+.panel{
+    margin-top:40px;
+    border:1px solid white;
+    padding:20px;
+}
+
+button{
+    background:black;
+    color:white;
+    border:1px solid white;
+    padding:10px 20px;
+    font-family:inherit;
+    margin-right:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:white;
+    color:black;
+}
+
+</style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>CURRENCY EXCHANGE</h1>
+<h1>AI FOREX ENGINE</h1>
 
-<!-- LOGIN -->
-<div class="card">
-<h2>Login</h2>
+<table>
 
-<input id="username" type="text" placeholder="Username">
-<input id="password" type="password" placeholder="Password">
+<tr>
+<th>PAIR</th>
+<th>PRICE</th>
+<th>VOLATILITY</th>
+<th>SIGNAL</th>
+</tr>
 
-<button onclick="login()">LOGIN</button>
+<tr>
+<td>EUR/USD</td>
+<td>1.0932</td>
+<td>MEDIUM</td>
+<td><span class="signal-buy">BUY</span></td>
+</tr>
 
-<p id="loginStatus"></p>
+<tr>
+<td>GBP/USD</td>
+<td>1.2744</td>
+<td>HIGH</td>
+<td><span class="signal-buy">BUY</span></td>
+</tr>
+
+<tr>
+<td>USD/JPY</td>
+<td>148.23</td>
+<td>LOW</td>
+<td class="signal-hold">HOLD</td>
+</tr>
+
+</table>
+
+<div class="panel">
+
+<p>Prediction</p>
+
+<p>Next Move: +0.012</p>
+
+<p>ATR Volatility: 0.006</p>
+
+<p><strong>Recommended Action:</strong> BUY EUR/USD</p>
+
 </div>
 
-<!-- CONVERTER -->
-<div class="card">
+<div style="margin-top:30px;">
 
-<h2>Currency Converter</h2>
-
-<label>From</label>
-<select id="fromCurrency"></select>
-
-<label>To</label>
-<select id="toCurrency"></select>
-
-<input id="amount" type="number" placeholder="Amount">
-
-<button onclick="convert()">CONVERT</button>
-
-<h3 id="result"></h3>
+<button>RUN MODEL</button>
+<button>BACKTEST</button>
+<button>EXECUTE</button>
 
 </div>
 
 </div>
-
-<script src="script.js"></script>
 
 </body>
 </html>
