@@ -1,4 +1,4 @@
-services/bankService.js
+// services/bankService.js
 
 async function sendToBank(amount) {
 
