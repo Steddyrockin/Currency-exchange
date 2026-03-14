@@ -1,31 +1,40 @@
-def expected_profit(current_price, predicted_price, threshold=0.01):
-    
-    change = predicted_price - current_price
-    
-    if abs(change) < threshold:
-        return 0
-        
+MAX_LOSS = 0.01
+
+
+def price_change(current_price, predicted_price):
+    return predicted_price - current_price
+
+
+def calculate_profit(current_price, predicted_price):
+
+    change = price_change(current_price, predicted_price)
+
+    # enforce maximum loss limit
+    if change < -MAX_LOSS:
+        return -MAX_LOSS
+
+    # no cap on profit
     return change
 
 
-def generate_signal(current_price, predicted_price, threshold=0.01):
+def generate_signal(current_price, predicted_price):
 
-    change = predicted_price - current_price
+    change = price_change(current_price, predicted_price)
 
-    if change > threshold:
+    if change > 0:
         return "BUY"
 
-    if change < -threshold:
+    if change < 0:
         return "SELL"
 
     return "HOLD"
 
 
-def maximize_profit(currency_predictions, threshold=0.01):
+def maximize_profit(currency_predictions):
 
     """
-    currency_predictions format:
-    
+    currency_predictions example:
+
     {
         "EURUSD": (current_price, predicted_price),
         "GBPUSD": (current_price, predicted_price),
@@ -41,22 +50,31 @@ def maximize_profit(currency_predictions, threshold=0.01):
 
         current_price, predicted_price = prices
 
-        profit = expected_profit(current_price, predicted_price, threshold)
+        profit = calculate_profit(current_price, predicted_price)
 
+        # ignore trades exceeding max loss
+        if profit < -MAX_LOSS:
+            continue
+
+        # choose the highest profit opportunity
         if profit > best_profit:
             best_profit = profit
             best_pair = pair
-            best_signal = generate_signal(current_price, predicted_price, threshold)
+            best_signal = generate_signal(current_price, predicted_price)
 
-    if best_profit <= 0:
+    # hold if no profitable trade exists
+    if best_pair is None or best_profit <= 0:
+
         return {
             "pair": None,
             "signal": "HOLD",
-            "expected_profit": 0
+            "expected_profit": 0,
+            "max_loss": MAX_LOSS
         }
 
     return {
         "pair": best_pair,
         "signal": best_signal,
-        "expected_profit": best_profit
+        "expected_profit": best_profit,
+        "max_loss": MAX_LOSS
     }
