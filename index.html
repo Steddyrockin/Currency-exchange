@@ -1,59 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Currency Exchange</title>
-    <link rel="stylesheet" href="styles.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currency Exchange</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- LOGIN SECTION -->
-    <div class="card">
-        <h1>CURRENCY EXCHANGE</h1>
+<h1>CURRENCY EXCHANGE</h1>
 
-        <input type="text" placeholder="Username" />
-        <input type="password" placeholder="Password" />
+<!-- LOGIN -->
+<div class="card">
+<h2>Login</h2>
 
-        <button>LOGIN</button>
-    </div>
+<input id="username" type="text" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
 
-    <!-- CONVERTER SECTION -->
-    <div class="card">
-        <h2>Converter</h2>
+<button onclick="login()">LOGIN</button>
 
-        <label>From</label>
-        <select>
-            <option>USD</option>
-            <option>EUR</option>
-            <option>GBP</option>
-            <option>JPY</option>
-            <option>AUD</option>
-            <option>CAD</option>
-            <option>CHF</option>
-            <option>CNY</option>
-            <option>INR</option>
-            <option>All Currencies...</option>
-        </select>
+<p id="loginStatus"></p>
+</div>
 
-        <label>To</label>
-        <select>
-            <option>EUR</option>
-            <option>USD</option>
-            <option>GBP</option>
-            <option>JPY</option>
-            <option>All Currencies...</option>
-        </select>
+<!-- CONVERTER -->
+<div class="card">
 
-        <input type="number" placeholder="Amount" />
+<h2>Currency Converter</h2>
 
-        <button>CONVERT</button>
-    </div>
+<label>From</label>
+<select id="fromCurrency"></select>
+
+<label>To</label>
+<select id="toCurrency"></select>
+
+<input id="amount" type="number" placeholder="Amount">
+
+<button onclick="convert()">CONVERT</button>
+
+<h3 id="result"></h3>
 
 </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
