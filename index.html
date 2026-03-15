@@ -8,73 +8,67 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --bg:#000;
-    --text:#fff;
-    --border:#fff;
+
+:root{
+--bg:#000;
+--text:#fff;
+--border:#fff;
 }
 
 *{box-sizing:border-box;}
 
 body{
-    margin:0;
-    padding:40px;
-    background:var(--bg);
-    color:var(--text);
-    font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
+margin:0;
+padding:40px;
+background:var(--bg);
+color:var(--text);
+font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
 }
 
 .container{
-    max-width:1000px;
-    margin:auto;
+max-width:1000px;
+margin:auto;
 }
 
 h1{
-    font-size:28px;
-    letter-spacing:2px;
-    border-bottom:1px solid var(--border);
-    padding-bottom:10px;
+font-size:28px;
+letter-spacing:2px;
+border-bottom:1px solid white;
+padding-bottom:10px;
 }
 
 table{
-    width:100%;
-    margin-top:30px;
-    border-collapse:collapse;
+width:100%;
+margin-top:30px;
+border-collapse:collapse;
 }
 
 th,td{
-    padding:12px;
-    text-align:left;
-    border-bottom:1px solid var(--border);
+padding:12px;
+border-bottom:1px solid white;
+text-align:left;
 }
 
 .panel{
-    margin-top:40px;
-    border:1px solid var(--border);
-    padding:20px;
+margin-top:40px;
+border:1px solid white;
+padding:20px;
 }
 
 button{
-    width:100%;
-    margin-top:30px;
-    padding:12px;
-    background:black;
-    color:white;
-    border:1px solid white;
-    cursor:pointer;
-    font-family:inherit;
-    transition:.2s;
+width:100%;
+margin-top:30px;
+padding:12px;
+background:black;
+color:white;
+border:1px solid white;
+cursor:pointer;
+font-family:inherit;
 }
 
 button:hover{
-    background:white;
-    color:black;
-}
-
-.payout-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+background:white;
+color:black;
 }
 
 </style>
@@ -87,6 +81,7 @@ button:hover{
 <h1>CURRENCY EXCHANGE</h1>
 
 <table>
+
 <thead>
 <tr>
 <th>TRADE</th>
@@ -97,35 +92,67 @@ button:hover{
 </thead>
 
 <tbody>
-<tr><td>EUR-USD</td><td>1.0932</td><td>+0.0021</td><td>+0.19%</td></tr>
-<tr><td>USD-JPY</td><td>148.32</td><td>-0.45</td><td>-0.30%</td></tr>
-<tr><td>GBP-USD</td><td>1.2785</td><td>+0.0018</td><td>+0.14%</td></tr>
-<tr><td>AUD-USD</td><td>0.6621</td><td>-0.0009</td><td>-0.13%</td></tr>
-<tr><td>USD-CAD</td><td>1.3542</td><td>+0.0012</td><td>+0.09%</td></tr>
-<tr><td>USD-CHF</td><td>0.8845</td><td>-0.0020</td><td>-0.23%</td></tr>
-<tr><td>EUR-JPY</td><td>162.14</td><td>+0.55</td><td>+0.34%</td></tr>
-<tr><td>EUR-GBP</td><td>0.8552</td><td>-0.0004</td><td>-0.05%</td></tr>
-<tr><td>USD-HKD</td><td>7.8201</td><td>+0.0003</td><td>+0.04%</td></tr>
-<tr><td>EUR-CHF</td><td>0.9678</td><td>-0.0015</td><td>-0.15%</td></tr>
-<tr><td>USD-KRW</td><td>1325.40</td><td>+2.10</td><td>+0.16%</td></tr>
+
+<tr><td>EUR-USD</td><td id="EURUSD">--</td><td>-</td><td>-</td></tr>
+<tr><td>USD-JPY</td><td id="USDJPY">--</td><td>-</td><td>-</td></tr>
+<tr><td>GBP-USD</td><td id="GBPUSD">--</td><td>-</td><td>-</td></tr>
+<tr><td>AUD-USD</td><td id="AUDUSD">--</td><td>-</td><td>-</td></tr>
+<tr><td>USD-CAD</td><td id="USDCAD">--</td><td>-</td><td>-</td></tr>
+<tr><td>USD-CHF</td><td id="USDCHF">--</td><td>-</td><td>-</td></tr>
+<tr><td>EUR-JPY</td><td id="EURJPY">--</td><td>-</td><td>-</td></tr>
+<tr><td>EUR-GBP</td><td id="EURGBP">--</td><td>-</td><td>-</td></tr>
+<tr><td>USD-HKD</td><td id="USDHKD">--</td><td>-</td><td>-</td></tr>
+<tr><td>EUR-CHF</td><td id="EURCHF">--</td><td>-</td><td>-</td></tr>
+<tr><td>USD-KRW</td><td id="USDKRW">--</td><td>-</td><td>-</td></tr>
+
 </tbody>
+
 </table>
 
 <div class="panel">
 
-<div class="payout-row">
+<div style="display:flex;justify-content:space-between;">
 <p><strong>DAILY PAYOUT</strong></p>
-<p><strong>BANK</strong></p>
+<p><strong>BANK: JPMorgan Chase & Co.</strong></p>
 </div>
 
 <p>USD: $58.00</p>
-<p>JPMorgan Chase & Co.</p>
 
 </div>
 
 <button>RUN</button>
 
 </div>
+
+<script>
+
+async function loadForex(){
+
+const res = await fetch("https://api.exchangerate.host/latest?base=USD");
+
+const data = await res.json();
+
+const r = data.rates;
+
+document.getElementById("EURUSD").innerText = (1/r.EUR).toFixed(4);
+document.getElementById("USDJPY").innerText = r.JPY.toFixed(2);
+document.getElementById("GBPUSD").innerText = (1/r.GBP).toFixed(4);
+document.getElementById("AUDUSD").innerText = (1/r.AUD).toFixed(4);
+document.getElementById("USDCAD").innerText = r.CAD.toFixed(4);
+document.getElementById("USDCHF").innerText = r.CHF.toFixed(4);
+document.getElementById("EURJPY").innerText = (r.JPY/r.EUR).toFixed(2);
+document.getElementById("EURGBP").innerText = (r.GBP/r.EUR).toFixed(4);
+document.getElementById("USDHKD").innerText = r.HKD.toFixed(4);
+document.getElementById("EURCHF").innerText = (r.CHF/r.EUR).toFixed(4);
+document.getElementById("USDKRW").innerText = r.KRW.toFixed(2);
+
+}
+
+loadForex();
+
+setInterval(loadForex,30000);
+
+</script>
 
 </body>
 </html>
