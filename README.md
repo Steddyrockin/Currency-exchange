@@ -1,22 +1,25 @@
-# Currency Exchange
+Currency Exchange
 
-AI-powered global currency exchange system.
+Autonomous AI system designed to monitor global currency markets,
+identify profitable exchange opportunities, and execute trades.
 
 Features
-- Facebook login
-- Forex monitoring dashboard
-- AI trading signals
-- Automated payout system
-- Global currency tracking
 
-Bank:
-JPMorgan Chase & Co.
+• AI forex scanner
+• automated trading signals
+• penny-loss protection
+• 24/7 execution
+• Stripe deposits
+• Facebook authentication
+• daily profit payouts
+• calculator-style interface
 
-Daily profit distribution:
-30% sent to bank account at 11:59 PM.
+System Workflow
 
-Technology
-- Node.js
-- Express
-- Facebook Login
-- AI Forex Models
+1. User logs in with Facebook
+2. Funds added via Stripe
+3. AI scans forex markets
+4. Trades executed if profitable
+5. Loss guard protects capital
+6. System runs continuously
+7. 30% of daily profit sent to Chase account at 11:59 PM
