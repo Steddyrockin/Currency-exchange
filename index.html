@@ -9,67 +9,74 @@
 
 <style>
 :root {
-    --bg: #000;
-    --text: #fff;
-    --border: #fff;
+    --bg:#000;
+    --text:#fff;
+    --border:#fff;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box;}
 
-body {
-    margin: 0;
-    padding: 40px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: "JetBrains Mono","Roboto Mono","SF Mono",monospace;
+body{
+    margin:0;
+    padding:40px;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
 }
 
-.container {
-    max-width: 1000px;
-    margin: auto;
+.container{
+    max-width:1000px;
+    margin:auto;
 }
 
-h1 {
-    font-size: 28px;
-    letter-spacing: 2px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
+h1{
+    font-size:28px;
+    letter-spacing:2px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:10px;
 }
 
-table {
-    width: 100%;
-    margin-top: 30px;
-    border-collapse: collapse;
+table{
+    width:100%;
+    margin-top:30px;
+    border-collapse:collapse;
 }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
+th,td{
+    padding:12px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
 }
 
-.panel {
-    margin-top: 40px;
-    border: 1px solid var(--border);
-    padding: 20px;
+.panel{
+    margin-top:40px;
+    border:1px solid var(--border);
+    padding:20px;
 }
 
-button {
-    width: 100%;
-    margin-top: 30px;
-    padding: 12px;
-    background: var(--bg);
-    color: var(--text);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    font-family: inherit;
-    transition: 0.2s ease;
+button{
+    width:100%;
+    margin-top:30px;
+    padding:12px;
+    background:black;
+    color:white;
+    border:1px solid white;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.2s;
 }
 
-button:hover {
-    background: var(--text);
-    color: var(--bg);
+button:hover{
+    background:white;
+    color:black;
 }
+
+.payout-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
 </style>
 </head>
 
@@ -105,8 +112,14 @@ button:hover {
 </table>
 
 <div class="panel">
+
+<div class="payout-row">
 <p><strong>DAILY PAYOUT</strong></p>
+<p><strong>BANK: JPMorgan Chase & Co.</strong></p>
+</div>
+
 <p>USD: $58.00</p>
+
 </div>
 
 <button>RUN</button>
