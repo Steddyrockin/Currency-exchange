@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
+
+<script async defer crossorigin="anonymous"
+src="https://connect.facebook.net/en_US/sdk.js"></script>
 
 <style>
 
@@ -88,6 +93,7 @@ margin-top:10px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -125,6 +131,7 @@ margin-top:10px;
 <tr><td>USD-KRW</td><td id="USDKRW">--</td><td>-</td><td>-</td><td id="alloc11">$0</td></tr>
 
 </tbody>
+
 </table>
 
 <div class="panel">
@@ -143,120 +150,143 @@ BALANCE: $<span id="balance">0</span>
 
 <div class="panel">
 
-<strong>AI TRADING ENGINE</strong>
-
-<button onclick="runAI()">RUN AI ENGINE</button>
-<button onclick="executeTrades()">EXECUTE TRADES</button>
-
-</div>
-
-<div class="panel">
-
 <strong>DAILY PAYOUT</strong>
 
-<p>30% profit sent automatically at 11:59 PM</p>
+<p id="payout">$0</p>
 
 <p><strong>JPMorgan Chase & Co.</strong></p>
 
-<button onclick="runDistribution()">RUN PAYOUT NOW</button>
-
 </div>
+
+<button onclick="runAI()">RUN AI TRADING</button>
+
+<button onclick="runDistribution()">RUN DISTRIBUTION</button>
 
 </div>
 
 <script>
 
+const API = "http://localhost:4000/api"
+
 let balance = 0
 
-/* FACEBOOK LOGIN */
+/* -----------------------
+FACEBOOK LOGIN
+----------------------- */
 
-function facebookLogin(){
+window.fbAsyncInit = function() {
 
-window.location.href="/api/login/facebook"
+FB.init({
+appId : 'FACEBOOK_APP_ID',
+cookie : true,
+xfbml : true,
+version : 'v19.0'
+})
 
 }
 
-/* ADD FUNDS */
+function facebookLogin(){
+
+FB.login(function(response){
+
+if(response.authResponse){
+
+fetch(API + "/auth/facebook",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(response.authResponse)
+})
+
+}
+
+})
+
+}
+
+/* -----------------------
+ADD FUNDS VIA STRIPE
+----------------------- */
 
 async function addFunds(){
 
 const input = document.getElementById("fundInput")
+
 const amount = parseFloat(input.value)
 
-if(!amount || amount<=0){
+if(!amount || amount <= 0){
 alert("Enter valid amount")
 return
 }
+
+const res = await fetch(API + "/stripe/deposit",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({amount})
+
+})
+
+const data = await res.json()
 
 balance += amount
 
 document.getElementById("balance").innerText = balance.toFixed(2)
 
-await fetch("/api/add-funds",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({amount})
-})
-
 input.value=""
 
 }
 
-/* AI ENGINE */
+/* -----------------------
+AI TRADING
+----------------------- */
 
 async function runAI(){
 
-const res = await fetch("/api/run-ai")
+await fetch(API + "/ai/run",{
 
-const data = await res.json()
-
-console.log("AI SIGNALS",data)
-
-alert("AI engine executed")
-
-}
-
-/* EXECUTE TRADES */
-
-async function executeTrades(){
-
-const res = await fetch("/api/execute-trade",{
 method:"POST"
+
 })
 
-const data = await res.json()
-
-console.log("Trades executed",data)
-
-alert("Trades executed")
+alert("AI trading engine started")
 
 }
 
-/* DISTRIBUTION */
+/* -----------------------
+DISTRIBUTION
+----------------------- */
 
 async function runDistribution(){
 
-if(balance<=0){
+const rows = 11
+
+if(balance <= 0){
 alert("No funds available")
 return
 }
 
-const rows=11
-const allocation=balance/rows
+const allocation = balance / rows
 
 for(let i=1;i<=rows;i++){
-document.getElementById("alloc"+i).innerText="$"+allocation.toFixed(2)
+
+document.getElementById("alloc"+i).innerText =
+"$" + allocation.toFixed(2)
+
 }
 
-await fetch("/api/distribute-profit",{
+await fetch(API + "/portfolio/distribute",{
 method:"POST"
 })
 
-alert("Profit distribution executed")
-
 }
 
-/* FOREX DATA */
+/* -----------------------
+FOREX DATA
+----------------------- */
 
 async function loadForex(){
 
@@ -264,37 +294,55 @@ const res = await fetch("https://api.exchangerate.host/latest?base=USD")
 
 const data = await res.json()
 
-const r=data.rates
+const r = data.rates
 
-document.getElementById("EURUSD").innerText=(1/r.EUR).toFixed(4)
-document.getElementById("USDJPY").innerText=r.JPY.toFixed(2)
-document.getElementById("GBPUSD").innerText=(1/r.GBP).toFixed(4)
-document.getElementById("AUDUSD").innerText=(1/r.AUD).toFixed(4)
-document.getElementById("USDCAD").innerText=r.CAD.toFixed(4)
-document.getElementById("USDCHF").innerText=r.CHF.toFixed(4)
-document.getElementById("EURJPY").innerText=(r.JPY/r.EUR).toFixed(2)
-document.getElementById("EURGBP").innerText=(r.GBP/r.EUR).toFixed(4)
-document.getElementById("USDHKD").innerText=r.HKD.toFixed(4)
-document.getElementById("EURCHF").innerText=(r.CHF/r.EUR).toFixed(4)
-document.getElementById("USDKRW").innerText=r.KRW.toFixed(2)
+document.getElementById("EURUSD").innerText = (1/r.EUR).toFixed(4)
+document.getElementById("USDJPY").innerText = r.JPY.toFixed(2)
+document.getElementById("GBPUSD").innerText = (1/r.GBP).toFixed(4)
+document.getElementById("AUDUSD").innerText = (1/r.AUD).toFixed(4)
+document.getElementById("USDCAD").innerText = r.CAD.toFixed(4)
+document.getElementById("USDCHF").innerText = r.CHF.toFixed(4)
+document.getElementById("EURJPY").innerText = (r.JPY/r.EUR).toFixed(2)
+document.getElementById("EURGBP").innerText = (r.GBP/r.EUR).toFixed(4)
+document.getElementById("USDHKD").innerText = r.HKD.toFixed(4)
+document.getElementById("EURCHF").innerText = (r.CHF/r.EUR).toFixed(4)
+document.getElementById("USDKRW").innerText = r.KRW.toFixed(2)
 
 }
 
-/* AUTO REFRESH FOREX */
+/* -----------------------
+PORTFOLIO SYNC
+----------------------- */
+
+async function loadPortfolio(){
+
+const res = await fetch(API + "/portfolio")
+
+const data = await res.json()
+
+balance = data.balance
+
+document.getElementById("balance").innerText = balance.toFixed(2)
+
+document.getElementById("payout").innerText =
+"$" + data.dailyProfit
+
+}
+
+/* -----------------------
+AUTO RUN
+----------------------- */
 
 loadForex()
 
+loadPortfolio()
+
 setInterval(loadForex,30000)
 
-/* AUTO RUN AI */
-
-setInterval(runAI,60000)
-
-/* AUTO TRADING LOOP */
-
-setInterval(executeTrades,120000)
+setInterval(loadPortfolio,60000)
 
 </script>
 
 </body>
+
 </html>
