@@ -271,4 +271,4 @@ This project is intended for educational and development purposes. Financial tra
 
 # Author
 
-Stedman Cleveland
+Stedman Robaire Cleveland
