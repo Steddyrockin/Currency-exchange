@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
@@ -95,6 +96,8 @@ margin-top:10px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
+<button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
+
 <table>
 
 <thead>
@@ -122,7 +125,6 @@ margin-top:10px;
 <tr><td>USD-KRW</td><td id="USDKRW">--</td><td>-</td><td>-</td><td id="alloc11">$0</td></tr>
 
 </tbody>
-
 </table>
 
 <div class="panel">
@@ -141,83 +143,156 @@ BALANCE: $<span id="balance">0</span>
 
 <div class="panel">
 
-<div style="display:flex;justify-content:space-between;">
-<p><strong>DAILY PAYOUT</strong></p>
+<strong>AI TRADING ENGINE</strong>
+
+<button onclick="runAI()">RUN AI ENGINE</button>
+<button onclick="executeTrades()">EXECUTE TRADES</button>
+
 </div>
 
-<p>USD: $58.00</p>
+<div class="panel">
+
+<strong>DAILY PAYOUT</strong>
+
+<p>30% profit sent automatically at 11:59 PM</p>
+
 <p><strong>JPMorgan Chase & Co.</strong></p>
 
-</div>
+<button onclick="runDistribution()">RUN PAYOUT NOW</button>
 
-<button onclick="runDistribution()">RUN</button>
+</div>
 
 </div>
 
 <script>
 
-let balance = 0;
+let balance = 0
 
-function addFunds(){
+/* FACEBOOK LOGIN */
 
-const input = document.getElementById("fundInput");
-const amount = parseFloat(input.value);
+function facebookLogin(){
 
-if(!amount || amount <= 0){
-alert("Enter valid amount");
-return;
-}
-
-balance += amount;
-
-document.getElementById("balance").innerText = balance.toFixed(2);
-
-input.value="";
+window.location.href="/api/login/facebook"
 
 }
 
-function runDistribution(){
+/* ADD FUNDS */
 
-const rows = 11;
+async function addFunds(){
 
-if(balance <= 0){
-alert("No funds available");
-return;
+const input = document.getElementById("fundInput")
+const amount = parseFloat(input.value)
+
+if(!amount || amount<=0){
+alert("Enter valid amount")
+return
 }
 
-const allocation = balance / rows;
+balance += amount
+
+document.getElementById("balance").innerText = balance.toFixed(2)
+
+await fetch("/api/add-funds",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({amount})
+})
+
+input.value=""
+
+}
+
+/* AI ENGINE */
+
+async function runAI(){
+
+const res = await fetch("/api/run-ai")
+
+const data = await res.json()
+
+console.log("AI SIGNALS",data)
+
+alert("AI engine executed")
+
+}
+
+/* EXECUTE TRADES */
+
+async function executeTrades(){
+
+const res = await fetch("/api/execute-trade",{
+method:"POST"
+})
+
+const data = await res.json()
+
+console.log("Trades executed",data)
+
+alert("Trades executed")
+
+}
+
+/* DISTRIBUTION */
+
+async function runDistribution(){
+
+if(balance<=0){
+alert("No funds available")
+return
+}
+
+const rows=11
+const allocation=balance/rows
 
 for(let i=1;i<=rows;i++){
-document.getElementById("alloc"+i).innerText = "$" + allocation.toFixed(2);
+document.getElementById("alloc"+i).innerText="$"+allocation.toFixed(2)
 }
 
+await fetch("/api/distribute-profit",{
+method:"POST"
+})
+
+alert("Profit distribution executed")
+
 }
+
+/* FOREX DATA */
 
 async function loadForex(){
 
-const res = await fetch("https://api.exchangerate.host/latest?base=USD");
+const res = await fetch("https://api.exchangerate.host/latest?base=USD")
 
-const data = await res.json();
+const data = await res.json()
 
-const r = data.rates;
+const r=data.rates
 
-document.getElementById("EURUSD").innerText = (1/r.EUR).toFixed(4);
-document.getElementById("USDJPY").innerText = r.JPY.toFixed(2);
-document.getElementById("GBPUSD").innerText = (1/r.GBP).toFixed(4);
-document.getElementById("AUDUSD").innerText = (1/r.AUD).toFixed(4);
-document.getElementById("USDCAD").innerText = r.CAD.toFixed(4);
-document.getElementById("USDCHF").innerText = r.CHF.toFixed(4);
-document.getElementById("EURJPY").innerText = (r.JPY/r.EUR).toFixed(2);
-document.getElementById("EURGBP").innerText = (r.GBP/r.EUR).toFixed(4);
-document.getElementById("USDHKD").innerText = r.HKD.toFixed(4);
-document.getElementById("EURCHF").innerText = (r.CHF/r.EUR).toFixed(4);
-document.getElementById("USDKRW").innerText = r.KRW.toFixed(2);
+document.getElementById("EURUSD").innerText=(1/r.EUR).toFixed(4)
+document.getElementById("USDJPY").innerText=r.JPY.toFixed(2)
+document.getElementById("GBPUSD").innerText=(1/r.GBP).toFixed(4)
+document.getElementById("AUDUSD").innerText=(1/r.AUD).toFixed(4)
+document.getElementById("USDCAD").innerText=r.CAD.toFixed(4)
+document.getElementById("USDCHF").innerText=r.CHF.toFixed(4)
+document.getElementById("EURJPY").innerText=(r.JPY/r.EUR).toFixed(2)
+document.getElementById("EURGBP").innerText=(r.GBP/r.EUR).toFixed(4)
+document.getElementById("USDHKD").innerText=r.HKD.toFixed(4)
+document.getElementById("EURCHF").innerText=(r.CHF/r.EUR).toFixed(4)
+document.getElementById("USDKRW").innerText=r.KRW.toFixed(2)
 
 }
 
-loadForex();
+/* AUTO REFRESH FOREX */
 
-setInterval(loadForex,30000);
+loadForex()
+
+setInterval(loadForex,30000)
+
+/* AUTO RUN AI */
+
+setInterval(runAI,60000)
+
+/* AUTO TRADING LOOP */
+
+setInterval(executeTrades,120000)
 
 </script>
 
