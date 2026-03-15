@@ -1,35 +1,22 @@
-# Currency Exchange Platform
+# Currency Exchange
 
-A currency exchange system supporting all global currencies.
+AI-powered global currency exchange system.
 
-Features:
-- JWT Authentication
-- Live Exchange Rates
-- All Currency Pairs
-- Real-Time Updates
-- AI Signal Engine (LSTM-ready)
-- Clean Terminal UI
+Features
+- Facebook login
+- Forex monitoring dashboard
+- AI trading signals
+- Automated payout system
+- Global currency tracking
 
-## Tech Stack
-Frontend: React
-Backend: Node.js + Express
-AI Engine: Python (FastAPI)
-Database: MongoDB or PostgreSQL
-Deployment: Docker-ready
+Bank:
+JPMorgan Chase & Co.
 
-## Installation
+Daily profit distribution:
+30% sent to bank account at 11:59 PM.
 
-### Backend
-cd backend
-npm install
-npm start
-
-### Frontend
-cd frontend
-npm install
-npm start
-
-### AI Engine
-cd ai-engine
-pip install -r requirements.txt
-uvicorn app:app --reload
+Technology
+- Node.js
+- Express
+- Facebook Login
+- AI Forex Models
