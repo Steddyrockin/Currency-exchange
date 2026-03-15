@@ -1,74 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
 
 <style>
-
-body{
-    background:black;
-    color:white;
-    font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
-    padding:40px;
+:root {
+    --bg: #000;
+    --text: #fff;
+    --border: #fff;
 }
 
-.container{
-    max-width:900px;
-    margin:auto;
+* {
+    box-sizing: border-box;
 }
 
-h1{
-    font-size:28px;
-    letter-spacing:2px;
-    border-bottom:1px solid white;
-    padding-bottom:10px;
+body {
+    margin: 0;
+    padding: 40px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", "Roboto Mono", "SF Mono", monospace;
 }
 
-table{
-    width:100%;
-    margin-top:30px;
-    border-collapse:collapse;
+.container {
+    max-width: 900px;
+    margin: auto;
 }
 
-th,td{
-    padding:12px;
-    text-align:left;
-    border-bottom:1px solid white;
+h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
 }
 
-.panel{
-    margin-top:40px;
-    border:1px solid white;
-    padding:20px;
+table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
 }
 
-.signal-buy{
-    color:white;
-    background:black;
-    border:1px solid white;
-    padding:4px 8px;
-
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
 }
 
-button{
-    width:100%;
-    padding:12px;
-    background:black;
-    color:white;
-    border:1px solid white;
-    cursor:pointer;
-    font-family:inherit;
+.panel {
+    margin-top: 40px;
+    border: 1px solid var(--border);
+    padding: 20px;
 }
 
-button:hover{
-    background:white;
-    color:black;
+button {
+    width: 100%;
+    margin-top: 30px;
+    padding: 12px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.2s ease;
 }
 
+button:hover {
+    background: var(--text);
+    color: var(--bg);
+}
 </style>
-
 </head>
 
 <body>
@@ -78,38 +82,26 @@ button:hover{
 <h1>CURRENCY EXCHANGE</h1>
 
 <table>
-
+<thead>
 <tr>
 <th>TRADE</th>
-<th>AMOUNT</th>
+<th>PRICE</th>
 </tr>
-
+</thead>
+<tbody>
 <tr>
 <td>EUR/USD</td>
 <td>1.0932</td>
 </tr>
-
-<tr>
-<td>EUR/USD</td>
-<td>1.0932</td>
-</tr>
-
+</tbody>
 </table>
 
 <div class="panel">
-
 <p>DAILY PAYOUT</p>
-
 <p>USD: $58.00</p>
-
 </div>
-
-<div style="margin-top:30px;">
 
 <button>RUN</button>
-
-
-</div>
 
 </div>
 
