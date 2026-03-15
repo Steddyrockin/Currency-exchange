@@ -1,9 +1,0 @@
-<h1>CURRENCY EXCHANGE</h1>
-
-<p>Login to continue</p>
-
-<div class="fb-login-button"
-data-size="large"
-data-button-type="continue_with"
-onlogin="checkLoginState();">
-</div>
