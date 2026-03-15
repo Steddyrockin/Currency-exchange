@@ -57,7 +57,7 @@ padding:20px;
 
 button{
 width:100%;
-margin-top:30px;
+margin-top:20px;
 padding:12px;
 background:black;
 color:white;
@@ -69,6 +69,21 @@ font-family:inherit;
 button:hover{
 background:white;
 color:black;
+}
+
+input{
+width:100%;
+padding:12px;
+background:black;
+border:1px solid white;
+color:white;
+font-family:inherit;
+margin-top:10px;
+}
+
+.balance{
+font-size:20px;
+margin-top:10px;
 }
 
 </style>
@@ -88,26 +103,41 @@ color:black;
 <th>VALUE</th>
 <th>CHANGE</th>
 <th>NET CHANGE</th>
+<th>ALLOCATED</th>
 </tr>
 </thead>
 
 <tbody>
 
-<tr><td>EUR-USD</td><td id="EURUSD">--</td><td>-</td><td>-</td></tr>
-<tr><td>USD-JPY</td><td id="USDJPY">--</td><td>-</td><td>-</td></tr>
-<tr><td>GBP-USD</td><td id="GBPUSD">--</td><td>-</td><td>-</td></tr>
-<tr><td>AUD-USD</td><td id="AUDUSD">--</td><td>-</td><td>-</td></tr>
-<tr><td>USD-CAD</td><td id="USDCAD">--</td><td>-</td><td>-</td></tr>
-<tr><td>USD-CHF</td><td id="USDCHF">--</td><td>-</td><td>-</td></tr>
-<tr><td>EUR-JPY</td><td id="EURJPY">--</td><td>-</td><td>-</td></tr>
-<tr><td>EUR-GBP</td><td id="EURGBP">--</td><td>-</td><td>-</td></tr>
-<tr><td>USD-HKD</td><td id="USDHKD">--</td><td>-</td><td>-</td></tr>
-<tr><td>EUR-CHF</td><td id="EURCHF">--</td><td>-</td><td>-</td></tr>
-<tr><td>USD-KRW</td><td id="USDKRW">--</td><td>-</td><td>-</td></tr>
+<tr><td>EUR-USD</td><td id="EURUSD">--</td><td>-</td><td>-</td><td id="alloc1">$0</td></tr>
+<tr><td>USD-JPY</td><td id="USDJPY">--</td><td>-</td><td>-</td><td id="alloc2">$0</td></tr>
+<tr><td>GBP-USD</td><td id="GBPUSD">--</td><td>-</td><td>-</td><td id="alloc3">$0</td></tr>
+<tr><td>AUD-USD</td><td id="AUDUSD">--</td><td>-</td><td>-</td><td id="alloc4">$0</td></tr>
+<tr><td>USD-CAD</td><td id="USDCAD">--</td><td>-</td><td>-</td><td id="alloc5">$0</td></tr>
+<tr><td>USD-CHF</td><td id="USDCHF">--</td><td>-</td><td>-</td><td id="alloc6">$0</td></tr>
+<tr><td>EUR-JPY</td><td id="EURJPY">--</td><td>-</td><td>-</td><td id="alloc7">$0</td></tr>
+<tr><td>EUR-GBP</td><td id="EURGBP">--</td><td>-</td><td>-</td><td id="alloc8">$0</td></tr>
+<tr><td>USD-HKD</td><td id="USDHKD">--</td><td>-</td><td>-</td><td id="alloc9">$0</td></tr>
+<tr><td>EUR-CHF</td><td id="EURCHF">--</td><td>-</td><td>-</td><td id="alloc10">$0</td></tr>
+<tr><td>USD-KRW</td><td id="USDKRW">--</td><td>-</td><td>-</td><td id="alloc11">$0</td></tr>
 
 </tbody>
 
 </table>
+
+<div class="panel">
+
+<strong>ADD FUNDS</strong>
+
+<input type="number" id="fundInput" placeholder="Enter USD amount"/>
+
+<button onclick="addFunds()">ADD FUNDS</button>
+
+<div class="balance">
+BALANCE: $<span id="balance">0</span>
+</div>
+
+</div>
 
 <div class="panel">
 
@@ -120,11 +150,48 @@ color:black;
 
 </div>
 
-<button>RUN</button>
+<button onclick="runDistribution()">RUN</button>
 
 </div>
 
 <script>
+
+let balance = 0;
+
+function addFunds(){
+
+const input = document.getElementById("fundInput");
+const amount = parseFloat(input.value);
+
+if(!amount || amount <= 0){
+alert("Enter valid amount");
+return;
+}
+
+balance += amount;
+
+document.getElementById("balance").innerText = balance.toFixed(2);
+
+input.value="";
+
+}
+
+function runDistribution(){
+
+const rows = 11;
+
+if(balance <= 0){
+alert("No funds available");
+return;
+}
+
+const allocation = balance / rows;
+
+for(let i=1;i<=rows;i++){
+document.getElementById("alloc"+i).innerText = "$" + allocation.toFixed(2);
+}
+
+}
 
 async function loadForex(){
 
