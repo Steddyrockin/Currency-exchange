@@ -271,8 +271,4 @@ This project is intended for educational and development purposes. Financial tra
 
 # Author
 
-Currency Exchange Platform
-AI-Driven Global Currency Trading System
-
-Currency Exchange Platform
-AI-Driven Global Currency Trading System
+Stedman Cleveland
