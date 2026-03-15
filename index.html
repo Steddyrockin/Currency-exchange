@@ -1,59 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Currency Exchange</title>
-    <link rel="stylesheet" href="styles.css"/>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Currency Exchange</title>
+
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#000;
+--text:#fff;
+}
+
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+padding:40px;
+background:var(--bg);
+color:var(--text);
+font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
+}
+
+.container{max-width:1000px;margin:auto;}
+
+h1{
+font-size:28px;
+letter-spacing:2px;
+border-bottom:1px solid white;
+padding-bottom:10px;
+}
+
+table{
+width:100%;
+margin-top:30px;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid white;
+}
+
+button{
+width:100%;
+margin-top:15px;
+padding:12px;
+background:black;
+color:white;
+border:1px solid white;
+cursor:pointer;
+font-family:inherit;
+}
+
+button:hover{
+background:white;
+color:black;
+}
+
+input{
+width:100%;
+padding:12px;
+background:black;
+border:1px solid white;
+color:white;
+margin-top:10px;
+font-family:inherit;
+}
+
+.panel{
+margin-top:40px;
+border:1px solid white;
+padding:20px;
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- LOGIN SECTION -->
-    <div class="card">
-        <h1>CURRENCY EXCHANGE</h1>
+<h1>CURRENCY EXCHANGE</h1>
 
-        <input type="text" placeholder="Username" />
-        <input type="password" placeholder="Password" />
+<button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
 
-        <button>LOGIN</button>
-    </div>
+<table>
+<thead>
+<tr>
+<th>TRADE</th>
+<th>VALUE</th>
+<th>CHANGE</th>
+<th>NET %</th>
+<th>ALLOCATED</th>
+</tr>
+</thead>
+<tbody id="tradeTable"></tbody>
+</table>
 
-    <!-- CONVERTER SECTION -->
-    <div class="card">
-        <h2>Converter</h2>
+<div class="panel">
+<strong>ADD FUNDS</strong>
+<input type="number" id="fundInput" placeholder="Enter USD amount"/>
+<button onclick="addFunds()">ADD FUNDS</button>
+<div>BALANCE: $<span id="balance">0</span></div>
+</div>
 
-        <label>From</label>
-        <select>
-            <option>USD</option>
-            <option>EUR</option>
-            <option>GBP</option>
-            <option>JPY</option>
-            <option>AUD</option>
-            <option>CAD</option>
-            <option>CHF</option>
-            <option>CNY</option>
-            <option>INR</option>
-            <option>All Currencies...</option>
-        </select>
+<div class="panel">
+<strong>DAILY PAYOUT (30%)</strong>
+<p id="payout">$0</p>
+<p><strong>JPMorgan Chase & Co.</strong></p>
+</div>
 
-        <label>To</label>
-        <select>
-            <option>EUR</option>
-            <option>USD</option>
-            <option>GBP</option>
-            <option>JPY</option>
-            <option>All Currencies...</option>
-        </select>
-
-        <input type="number" placeholder="Amount" />
-
-        <button>CONVERT</button>
-    </div>
+<button onclick="runAI()">RUN AI TRADING</button>
+<button onclick="runDistribution()">RUN DISTRIBUTION</button>
 
 </div>
+
+<script>
+
+const API = "http://localhost:4000/api"
+
+let balance = 0
+let trades = [
+"EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
+"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
+]
+
+let previous = {}
+let prices = {}
+
+
+// Build Table Dynamically
+function buildTable(){
+
+const table = document.getElementById("tradeTable")
+
+trades.forEach((pair,i)=>{
+
+const row = document.createElement("tr")
+
+row.innerHTML = `
+<td>${pair}</td>
+<td id="${pair}">--</td>
+<td id="change${pair}">-</td>
+<td id="net${pair}">-</td>
+<td id="alloc${i+1}">$0</td>
+`
+
+table.appendChild(row)
+
+})
+
+}
+
+
+// Load Market Data (Throttled)
+async function loadForex(){
+
+try{
+
+const res = await fetch("https://api.exchangerate.host/latest?base=USD")
+const data = await res.json()
+const r = data.rates
+
+prices = {
+EURUSD:1/r.EUR,
+USDJPY:r.JPY,
+GBPUSD:1/r.GBP,
+AUDUSD:1/r.AUD,
+USDCAD:r.CAD,
+USDCHF:r.CHF,
+EURJPY:r.JPY/r.EUR,
+EURGBP:r.GBP/r.EUR,
+USDHKD:r.HKD,
+EURCHF:r.CHF/r.EUR,
+USDKRW:r.KRW
+}
+
+}catch(e){}
+
+}
+
+
+// Update UI Every Second
+function updateTrades(){
+
+Object.keys(prices).forEach(pair=>{
+
+const base = prices[pair]
+if(!base) return
+
+const simulated = base + (Math.random()-0.5)*base*0.0005
+
+document.getElementById(pair).innerText =
+simulated.toFixed(4)
+
+if(previous[pair]){
+
+const diff = simulated - previous[pair]
+const percent = (diff/previous[pair])*100
+
+document.getElementById("change"+pair).innerText =
+diff.toFixed(5)
+
+document.getElementById("net"+pair).innerText =
+percent.toFixed(3)+"%"
+
+}
+
+previous[pair] = simulated
+
+})
+
+}
+
+
+// Portfolio Sync
+async function loadPortfolio(){
+
+try{
+
+const res = await fetch(API + "/portfolio")
+const data = await res.json()
+
+balance = data.balance || 0
+
+document.getElementById("balance").innerText =
+balance.toFixed(2)
+
+const profit = data.dailyProfit || 0
+const payout = profit * 0.30
+
+document.getElementById("payout").innerText =
+"$" + payout.toFixed(2)
+
+if(data.allocations){
+
+data.allocations.forEach((amt,i)=>{
+const cell = document.getElementById("alloc"+(i+1))
+if(cell) cell.innerText = "$"+amt.toFixed(2)
+})
+
+}
+
+}catch(e){}
+
+}
+
+
+// Add Funds
+async function addFunds(){
+
+const input = document.getElementById("fundInput")
+const amount = parseFloat(input.value)
+
+if(!amount || amount<=0) return alert("Invalid amount")
+
+await fetch(API+"/stripe/deposit",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({amount})
+})
+
+balance += amount
+document.getElementById("balance").innerText =
+balance.toFixed(2)
+
+input.value=""
+
+}
+
+
+// AI Engine
+async function runAI(){
+await fetch(API+"/ai/run",{method:"POST"})
+alert("AI Engine Started")
+}
+
+
+// Distribution
+async function runDistribution(){
+
+if(balance<=0) return alert("No funds")
+
+const rows = trades.length
+const allocation = balance/rows
+
+for(let i=1;i<=rows;i++){
+document.getElementById("alloc"+i).innerText =
+"$"+allocation.toFixed(2)
+}
+
+await fetch(API+"/portfolio/distribute",{method:"POST"})
+
+}
+
+
+// Facebook Login
+window.fbAsyncInit = function(){
+FB.init({
+appId:'FACEBOOK_APP_ID',
+cookie:true,
+xfbml:true,
+version:'v19.0'
+})
+}
+
+function facebookLogin(){
+FB.login(function(response){
+if(response.authResponse){
+fetch(API+"/auth/facebook",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(response.authResponse)
+})
+}
+})
+}
+
+
+// INIT
+buildTable()
+loadForex()
+loadPortfolio()
+
+setInterval(loadForex,10000)     // market refresh
+setInterval(updateTrades,1000)   // UI refresh
+setInterval(loadPortfolio,60000)
+
+</script>
+
+<script async defer crossorigin="anonymous"
+src="https://connect.facebook.net/en_US/sdk.js"></script>
 
 </body>
 </html>
