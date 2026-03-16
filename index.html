@@ -100,6 +100,12 @@ padding:20px;
 <tbody id="tradeTable"></tbody>
 </table>
 
+<!-- 🔄 ALLOCATED MODULE (UNDER TABLE) -->
+<div class="panel">
+<strong>ALLOCATED (IN CIRCULATION)</strong>
+<p id="allocatedAmount">$0</p>
+</div>
+
 <div class="panel">
 <strong>DEPOSIT</strong>
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
@@ -114,11 +120,6 @@ padding:20px;
 <div class="panel">
 <strong>TOTAL AMOUNT EARNED (LIFETIME)</strong>
 <p id="totalEarned">$0</p>
-</div>
-
-<div class="panel">
-<strong>ALLOCATED (IN CIRCULATION)</strong>
-<p id="allocatedAmount">$0</p>
 </div>
 
 </div>
@@ -239,18 +240,15 @@ try{
 const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
-// Daily payout
 const dailyProfit = data.dailyProfit || 0
 let payout = dailyProfit > 0 ? dailyProfit * 0.30 : 0
 
 document.getElementById("payout").innerText =
 "$" + payout.toFixed(2)
 
-// Total earned
 document.getElementById("totalEarned").innerText =
 "$" + (data.totalEarned || 0).toFixed(2)
 
-// Allocated (Money in Circulation)
 document.getElementById("allocatedAmount").innerText =
 "$" + (data.allocated || 0).toFixed(2)
 
@@ -260,27 +258,4 @@ document.getElementById("allocatedAmount").innerText =
 
 async function depositFunds(){
 
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
-
-if(!amount || amount<=0) return alert("Invalid amount")
-
-await fetch(API+"/stripe/deposit",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({amount})
-})
-
-runAI()
-input.value=""
-
-}
-
-async function runAI(){
-await fetch(API+"/ai/run",{method:"POST"})
-}
-
-</script>
-
-</body>
-</html>
+const input = document.getElement
