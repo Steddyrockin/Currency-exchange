@@ -87,8 +87,6 @@ padding:20px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
-
 <table>
 <thead>
 <tr>
@@ -238,16 +236,13 @@ balance = data.balance || 0
 document.getElementById("balance").innerText =
 balance.toFixed(2)
 
-// Initial deposit tracking
 if(initialDeposit === 0){
 initialDeposit = balance
 }
 
-// Total Lifetime Earned
 totalEarned = balance - initialDeposit
 if(totalEarned < 0) totalEarned = 0
 
-// Daily Profit
 if(startOfDayBalance === 0){
 startOfDayBalance = balance
 }
@@ -259,71 +254,4 @@ if(dailyProfit > 0){
 payout = dailyProfit * 0.30
 }
 
-document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
-
-document.getElementById("totalEarned").innerText =
-"$" + totalEarned.toFixed(2)
-
-}catch(e){}
-
-}
-
-async function addFunds(){
-
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
-
-if(!amount || amount<=0) return alert("Invalid amount")
-
-await fetch(API+"/stripe/deposit",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({amount})
-})
-
-balance += amount
-document.getElementById("balance").innerText =
-balance.toFixed(2)
-
-input.value=""
-
-// AUTO START AI
-runAI()
-
-}
-
-async function runAI(){
-await fetch(API+"/ai/run",{method:"POST"})
-console.log("AI Engine Running")
-}
-
-function resetDaily(){
-startOfDayBalance = balance
-}
-
-setInterval(()=>{
-
-const now = new Date()
-if(now.getHours() === 23 && now.getMinutes() === 59){
-resetDaily()
-}
-
-},60000)
-
-function facebookLogin(){
-console.log("Facebook login triggered")
-}
-
-buildTable()
-loadMarket()
-loadPortfolio()
-
-setInterval(loadMarket,10000)
-setInterval(updateMarket,1000)
-setInterval(loadPortfolio,60000)
-
-</script>
-
-</body>
-</html>
+document.getElementById("payout
