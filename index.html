@@ -44,6 +44,7 @@ th,td{
 padding:12px;
 border-bottom:1px solid black;
 font-size:14px;
+color:black;
 }
 
 button{
@@ -210,11 +211,19 @@ if(previous[asset]){
 const diff = simulated - previous[asset]
 const percent = (diff/previous[asset])*100
 
-document.getElementById("change"+asset).innerText =
-diff.toFixed(5)
+const netCell = document.getElementById("net"+asset)
 
-document.getElementById("net"+asset).innerText =
-percent.toFixed(3)+"%"
+netCell.innerText = percent.toFixed(3)+"%"
+
+if(percent > 0){
+netCell.style.color = "green"
+}
+else if(percent < 0){
+netCell.style.color = "red"
+}
+else{
+netCell.style.color = "black"
+}
 
 }
 
@@ -232,8 +241,8 @@ const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
 const dailyProfit = data.dailyProfit || 0
-let payout = 0
 
+let payout = 0
 if(dailyProfit > 0){
 payout = dailyProfit * 0.30
 }
@@ -262,7 +271,6 @@ body:JSON.stringify({amount})
 })
 
 runAI()
-
 input.value=""
 
 }
