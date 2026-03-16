@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Currency Exchange</title>
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 
 <style>
 
@@ -22,7 +22,7 @@ margin:0;
 padding:40px;
 background:var(--bg);
 color:var(--text);
-font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
+font-family:"JetBrains Mono",monospace;
 }
 
 .container{max-width:1000px;margin:auto;}
@@ -41,8 +41,9 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:15px;
+padding:12px;
 border-bottom:1px solid black;
+font-size:14px;
 }
 
 button{
@@ -86,16 +87,12 @@ padding:20px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<p style="margin-top:10px; font-size:14px;">
-Make money all day.
-</p>
-
 <button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
 
 <table>
 <thead>
 <tr>
-<th>TRADE</th>
+<th>ASSET</th>
 <th>VALUE</th>
 <th>CHANGE</th>
 <th>NET %</th>
@@ -112,7 +109,7 @@ Make money all day.
 </div>
 
 <div class="panel">
-<strong>DAILY PAYOUT (30%)</strong>
+<strong>DAILY PAYOUT (30% OF PROFIT)</strong>
 <p id="payout">$0</p>
 <p><strong>JPMorgan Chase & Co.</strong></p>
 </div>
@@ -126,9 +123,10 @@ const API = "http://localhost:4000/api"
 let balance = 0
 let startOfDayBalance = 0
 
-let trades = [
+let assets = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
-"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
+"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW",
+"XAUUSD","XAGUSD"
 ]
 
 let previous = {}
@@ -138,15 +136,15 @@ function buildTable(){
 
 const table = document.getElementById("tradeTable")
 
-trades.forEach(pair=>{
+assets.forEach(asset=>{
 
 const row = document.createElement("tr")
 
 row.innerHTML = `
-<td>${pair}</td>
-<td id="${pair}">--</td>
-<td id="change${pair}">-</td>
-<td id="net${pair}">-</td>
+<td>${asset}</td>
+<td id="${asset}">--</td>
+<td id="change${asset}">-</td>
+<td id="net${asset}">-</td>
 `
 
 table.appendChild(row)
@@ -155,7 +153,7 @@ table.appendChild(row)
 
 }
 
-async function loadForex(){
+async function loadMarket(){
 
 try{
 
@@ -164,6 +162,7 @@ const data = await res.json()
 const r = data.rates
 
 prices = {
+
 EURUSD:1/r.EUR,
 USDJPY:r.JPY,
 GBPUSD:1/r.GBP,
@@ -174,39 +173,44 @@ EURJPY:r.JPY/r.EUR,
 EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD,
 EURCHF:r.CHF/r.EUR,
-USDKRW:r.KRW
+USDKRW:r.KRW,
+
+// Metals (Simulated)
+XAUUSD:2000 + (Math.random()-0.5)*10,
+XAGUSD:25 + (Math.random()-0.5)*0.5
+
 }
 
 }catch(e){}
 
 }
 
-function updateTrades(){
+function updateMarket(){
 
-Object.keys(prices).forEach(pair=>{
+Object.keys(prices).forEach(asset=>{
 
-const base = prices[pair]
+const base = prices[asset]
 if(!base) return
 
 const simulated = base + (Math.random()-0.5)*base*0.0005
 
-document.getElementById(pair).innerText =
+document.getElementById(asset).innerText =
 simulated.toFixed(4)
 
-if(previous[pair]){
+if(previous[asset]){
 
-const diff = simulated - previous[pair]
-const percent = (diff/previous[pair])*100
+const diff = simulated - previous[asset]
+const percent = (diff/previous[asset])*100
 
-document.getElementById("change"+pair).innerText =
+document.getElementById("change"+asset).innerText =
 diff.toFixed(5)
 
-document.getElementById("net"+pair).innerText =
+document.getElementById("net"+asset).innerText =
 percent.toFixed(3)+"%"
 
 }
 
-previous[pair] = simulated
+previous[asset] = simulated
 
 })
 
@@ -216,7 +220,7 @@ async function loadPortfolio(){
 
 try{
 
-const res = await fetch(API + "/portfolio")
+const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
 balance = data.balance || 0
@@ -231,7 +235,6 @@ startOfDayBalance = balance
 const profit = balance - startOfDayBalance
 
 let payout = 0
-
 if(profit > 0){
 payout = profit * 0.30
 }
@@ -257,22 +260,22 @@ body:JSON.stringify({amount})
 })
 
 balance += amount
-
 document.getElementById("balance").innerText =
 balance.toFixed(2)
 
 input.value=""
 
+// AUTO START AI
 runAI()
 
 }
 
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-console.log("AI Trading Started")
+console.log("AI Engine Running")
 }
 
-function resetDailyProfit(){
+function resetDaily(){
 startOfDayBalance = balance
 }
 
@@ -281,44 +284,24 @@ setInterval(()=>{
 const now = new Date()
 
 if(now.getHours() === 23 && now.getMinutes() === 59){
-resetDailyProfit()
+resetDaily()
 }
 
 },60000)
 
-window.fbAsyncInit = function(){
-FB.init({
-appId:'FACEBOOK_APP_ID',
-cookie:true,
-xfbml:true,
-version:'v19.0'
-})
-}
-
 function facebookLogin(){
-FB.login(function(response){
-if(response.authResponse){
-fetch(API+"/auth/facebook",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(response.authResponse)
-})
-}
-})
+console.log("Facebook login triggered")
 }
 
 buildTable()
-loadForex()
+loadMarket()
 loadPortfolio()
 
-setInterval(loadForex,10000)
-setInterval(updateTrades,1000)
+setInterval(loadMarket,10000)
+setInterval(updateMarket,1000)
 setInterval(loadPortfolio,60000)
 
 </script>
-
-<script async defer crossorigin="anonymous"
-src="https://connect.facebook.net/en_US/sdk.js"></script>
 
 </body>
 </html>
