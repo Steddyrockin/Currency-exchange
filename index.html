@@ -116,6 +116,11 @@ padding:20px;
 <p id="totalEarned">$0</p>
 </div>
 
+<div class="panel">
+<strong>ALLOCATED (IN CIRCULATION)</strong>
+<p id="allocatedAmount">$0</p>
+</div>
+
 </div>
 
 <script>
@@ -215,15 +220,9 @@ const netCell = document.getElementById("net"+asset)
 
 netCell.innerText = percent.toFixed(3)+"%"
 
-if(percent > 0){
-netCell.style.color = "green"
-}
-else if(percent < 0){
-netCell.style.color = "red"
-}
-else{
-netCell.style.color = "black"
-}
+if(percent > 0) netCell.style.color="green"
+else if(percent < 0) netCell.style.color="red"
+else netCell.style.color="black"
 
 }
 
@@ -240,18 +239,20 @@ try{
 const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
+// Daily payout
 const dailyProfit = data.dailyProfit || 0
-
-let payout = 0
-if(dailyProfit > 0){
-payout = dailyProfit * 0.30
-}
+let payout = dailyProfit > 0 ? dailyProfit * 0.30 : 0
 
 document.getElementById("payout").innerText =
 "$" + payout.toFixed(2)
 
+// Total earned
 document.getElementById("totalEarned").innerText =
 "$" + (data.totalEarned || 0).toFixed(2)
+
+// Allocated (Money in Circulation)
+document.getElementById("allocatedAmount").innerText =
+"$" + (data.allocated || 0).toFixed(2)
 
 }catch(e){}
 
