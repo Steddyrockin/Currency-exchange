@@ -1,19 +1,33 @@
-const router = require("express").Router()
+const express = require("express")
+const router = express.Router()
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-const { updateBalance } = require("../services/portfolio")
 
-router.post("/deposit", async (req,res)=>{
+router.post("/deposit",async(req,res)=>{
 
-const { amount } = req.body
+const {amount} = req.body
 
-const payment = await stripe.paymentIntents.create({
-  amount: Math.round(amount*100),
-  currency:"usd"
+const session = await stripe.checkout.sessions.create({
+
+payment_method_types:["card"],
+
+line_items:[{
+price_data:{
+currency:"usd",
+product_data:{name:"Currency Exchange Deposit"},
+unit_amount:Math.round(amount*100)
+},
+quantity:1
+}],
+
+mode:"payment",
+
+success_url:"http://localhost:3000",
+cancel_url:"http://localhost:3000"
+
 })
 
-updateBalance(amount)
-
-res.json({ clientSecret: payment.client_secret })
+res.json({id:session.id})
 
 })
 
