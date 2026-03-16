@@ -128,30 +128,19 @@ let startOfDayBalance = 0
 
 let trades = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
-"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
+"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW",
+"XAUUSD","XAGUSD"
 ]
 
 let previous = {}
 let prices = {}
 
-function buildTable(){
+function getDisplay(pair){
 
-const table = document.getElementById("tradeTable")
+if(pair==="XAUUSD") return "XAU/USD"
+if(pair==="XAGUSD") return "XAG/USD"
 
-trades.forEach(pair=>{
-
-const row = document.createElement("tr")
-
-row.innerHTML = `
-<td>${pair}</td>
-<td id="${pair}">--</td>
-<td id="change${pair}">-</td>
-<td id="net${pair}">-</td>
-`
-
-table.appendChild(row)
-
-})
+return pair.substring(0,3) + "/" + pair.substring(3,6)
 
 }
 
@@ -174,10 +163,36 @@ EURJPY:r.JPY/r.EUR,
 EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD,
 EURCHF:r.CHF/r.EUR,
-USDKRW:r.KRW
+USDKRW:r.KRW,
+
+// Metals (simulated — replace with real API if needed)
+XAUUSD:2000 + (Math.random()*20),
+XAGUSD:25 + (Math.random()*1)
+
 }
 
 }catch(e){}
+
+}
+
+function buildTable(){
+
+const table = document.getElementById("tradeTable")
+
+trades.forEach(pair=>{
+
+const row = document.createElement("tr")
+
+row.innerHTML = `
+<td>${getDisplay(pair)}</td>
+<td id="${pair}">--</td>
+<td id="change${pair}">-</td>
+<td id="net${pair}">-</td>
+`
+
+table.appendChild(row)
+
+})
 
 }
 
