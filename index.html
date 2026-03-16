@@ -87,9 +87,8 @@ padding:20px;
 <h1>CURRENCY EXCHANGE</h1>
 
 <p style="margin-top:10px; font-size:14px;">
-Make money all day. 
+Make money all day.
 </p>
-
 
 <button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
 
@@ -100,7 +99,6 @@ Make money all day.
 <th>VALUE</th>
 <th>CHANGE</th>
 <th>NET %</th>
-<th>ALLOCATED</th>
 </tr>
 </thead>
 <tbody id="tradeTable"></tbody>
@@ -119,9 +117,6 @@ Make money all day.
 <p><strong>JPMorgan Chase & Co.</strong></p>
 </div>
 
-<button onclick="runAI()">RUN AI TRADING</button>
-<button onclick="runDistribution()">RUN DISTRIBUTION</button>
-
 </div>
 
 <script>
@@ -129,6 +124,7 @@ Make money all day.
 const API = "http://localhost:4000/api"
 
 let balance = 0
+
 let trades = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
 "USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
@@ -137,13 +133,11 @@ let trades = [
 let previous = {}
 let prices = {}
 
-
-// Build Table Dynamically
 function buildTable(){
 
 const table = document.getElementById("tradeTable")
 
-trades.forEach((pair,i)=>{
+trades.forEach(pair=>{
 
 const row = document.createElement("tr")
 
@@ -152,7 +146,6 @@ row.innerHTML = `
 <td id="${pair}">--</td>
 <td id="change${pair}">-</td>
 <td id="net${pair}">-</td>
-<td id="alloc${i+1}">$0</td>
 `
 
 table.appendChild(row)
@@ -161,8 +154,6 @@ table.appendChild(row)
 
 }
 
-
-// Load Market Data (Throttled)
 async function loadForex(){
 
 try{
@@ -189,8 +180,6 @@ USDKRW:r.KRW
 
 }
 
-
-// Update UI Every Second
 function updateTrades(){
 
 Object.keys(prices).forEach(pair=>{
@@ -222,8 +211,6 @@ previous[pair] = simulated
 
 }
 
-
-// Portfolio Sync
 async function loadPortfolio(){
 
 try{
@@ -242,21 +229,10 @@ const payout = profit * 0.30
 document.getElementById("payout").innerText =
 "$" + payout.toFixed(2)
 
-if(data.allocations){
-
-data.allocations.forEach((amt,i)=>{
-const cell = document.getElementById("alloc"+(i+1))
-if(cell) cell.innerText = "$"+amt.toFixed(2)
-})
-
-}
-
 }catch(e){}
 
 }
 
-
-// Add Funds
 async function addFunds(){
 
 const input = document.getElementById("fundInput")
@@ -276,35 +252,15 @@ balance.toFixed(2)
 
 input.value=""
 
+runAI()
+
 }
 
-
-// AI Engine
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-alert("AI Engine Started")
+console.log("AI Trading Started")
 }
 
-
-// Distribution
-async function runDistribution(){
-
-if(balance<=0) return alert("No funds")
-
-const rows = trades.length
-const allocation = balance/rows
-
-for(let i=1;i<=rows;i++){
-document.getElementById("alloc"+i).innerText =
-"$"+allocation.toFixed(2)
-}
-
-await fetch(API+"/portfolio/distribute",{method:"POST"})
-
-}
-
-
-// Facebook Login
 window.fbAsyncInit = function(){
 FB.init({
 appId:'FACEBOOK_APP_ID',
@@ -326,14 +282,12 @@ body:JSON.stringify(response.authResponse)
 })
 }
 
-
-// INIT
 buildTable()
 loadForex()
 loadPortfolio()
 
-setInterval(loadForex,10000)     // market refresh
-setInterval(updateTrades,1000)   // UI refresh
+setInterval(loadForex,10000)
+setInterval(updateTrades,1000)
 setInterval(loadPortfolio,60000)
 
 </script>
