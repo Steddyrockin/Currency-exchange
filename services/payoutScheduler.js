@@ -1,14 +1,14 @@
 const cron = require("node-cron")
+const portfolio = require("../models/portfolioModel")
 
-function startScheduler(){
+cron.schedule("59 23 * * *",()=>{
 
-cron.schedule("59 23 * * *", () => {
+const payout = portfolio.dailyProfit * 0.30
 
-// Send 30% profit to JPMorgan Chase
-console.log("Executing daily payout...")
+console.log("Daily payout to JPMorgan:",payout)
+
+portfolio.balance -= payout
+
+portfolio.dailyProfit = 0
 
 })
-
-}
-
-module.exports = { startScheduler }
