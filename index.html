@@ -121,19 +121,11 @@ letter-spacing:1px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<!-- ADD FUNDS -->
-
 <div class="panel">
-
 <strong>ADD FUNDS</strong>
-
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
-
 <button onclick="depositFunds()">SUBMIT</button>
-
 </div>
-
-<!-- TABLE -->
 
 <table>
 
@@ -150,34 +142,19 @@ letter-spacing:1px;
 
 </table>
 
-<!-- ALLOCATED -->
-
 <div class="panel">
-
 <strong>ALLOCATED (IN CIRCULATION)</strong>
-
 <p id="allocatedAmount">$0</p>
-
 </div>
 
-<!-- DAILY PAYOUT -->
-
 <div class="panel">
-
 <strong>DAILY PAYOUT (30% OF PROFIT)</strong>
-
 <p id="payout">$0</p>
-
 </div>
 
-<!-- TOTAL EARNED -->
-
 <div class="panel">
-
 <strong>TOTAL AMOUNT EARNED (LIFETIME)</strong>
-
 <p id="totalEarned">$0</p>
-
 </div>
 
 </div>
@@ -187,9 +164,14 @@ letter-spacing:1px;
 const API = "http://localhost:4000/api"
 
 let assets = [
+
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
 "USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW",
-"XAUUSD","XAGUSD","USOIL","NGAS"
+
+"XAUUSD","XAGUSD",
+
+"USOIL","BRENT","WTI","HEATOIL","GASOLINE","NGAS","NATGAS"
+
 ]
 
 let previous = {}
@@ -237,6 +219,7 @@ const data = await res.json()
 const r = data.rates
 
 prices = {
+
 EURUSD:1/r.EUR,
 USDJPY:r.JPY,
 GBPUSD:1/r.GBP,
@@ -248,10 +231,18 @@ EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD,
 EURCHF:r.CHF/r.EUR,
 USDKRW:r.KRW,
+
 XAUUSD:2000 + (Math.random()-0.5)*10,
 XAGUSD:25 + (Math.random()-0.5)*0.5,
+
 USOIL:75 + (Math.random()-0.5)*2,
-NGAS:3 + (Math.random()-0.5)*0.1
+BRENT:80 + (Math.random()-0.5)*2,
+WTI:76 + (Math.random()-0.5)*2,
+HEATOIL:2.5 + (Math.random()-0.5)*0.1,
+GASOLINE:2.3 + (Math.random()-0.5)*0.1,
+NGAS:3 + (Math.random()-0.5)*0.1,
+NATGAS:3.1 + (Math.random()-0.5)*0.1
+
 }
 
 }catch(e){}
