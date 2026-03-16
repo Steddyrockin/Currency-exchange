@@ -5,55 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Currency Exchange</title>
 
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
 
 <style>
 
-/* ===== 1980s TRADING CALCULATOR ===== */
+/* ===== GREY / BLACK TRADING CONSOLE ===== */
 
 :root{
+  --bg:#0e0e0e;
   --case:#1a1a1a;
-  --screen:#0b1a0b;
-  --green:#39ff14;
-  --button:#2b2b2b;
+  --screen:#2b2b2b;
+  --text:#e5e5e5;
+  --border:#444;
+  --button:#2c2c2c;
+  --button-hover:#3a3a3a;
 }
 
 *{box-sizing:border-box;}
 
 body{
   margin:0;
-  background:#111;
+  background:var(--bg);
   display:flex;
   justify-content:center;
-  padding:25px;
-  font-family:'VT323', monospace;
+  padding:30px;
+  font-family:"Courier Prime", monospace;
+  color:var(--text);
 }
 
 .container{
   width:900px;
   background:var(--case);
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 0 0 6px #000 inset;
+  padding:22px;
+  border:1px solid var(--border);
+  border-radius:12px;
 }
 
 /* ===== HEADER ===== */
 
 h1{
   text-align:center;
-  color:var(--green);
-  letter-spacing:4px;
-  font-size:28px;
+  font-size:22px;
+  letter-spacing:3px;
   margin:0 0 15px 0;
 }
 
-/* ===== LCD SCREEN ===== */
+/* ===== SCREEN AREA ===== */
 
 .screen{
   background:var(--screen);
-  border:5px solid #000;
+  border:1px solid var(--border);
   padding:15px;
-  color:var(--green);
+  margin-top:15px;
 }
 
 /* ===== TABLE ===== */
@@ -61,12 +64,12 @@ h1{
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:16px;
+  font-size:13px;
 }
 
 th,td{
-  border-bottom:1px solid #0f0;
-  padding:5px;
+  padding:6px;
+  border-bottom:1px solid var(--border);
 }
 
 /* ===== BUTTONS ===== */
@@ -74,19 +77,22 @@ th,td{
 button{
   width:100%;
   margin-top:10px;
-  padding:14px;
+  padding:12px;
   background:var(--button);
-  color:var(--green);
-  border:3px solid #000;
+  color:var(--text);
+  border:1px solid var(--border);
   font-family:inherit;
-  font-size:18px;
+  font-size:15px;
   cursor:pointer;
-  box-shadow:2px 2px 0 #000;
+  transition:0.15s;
+}
+
+button:hover{
+  background:var(--button-hover);
 }
 
 button:active{
-  transform:translateY(2px);
-  box-shadow:inset 2px 2px 3px #000;
+  transform:translateY(1px);
 }
 
 /* ===== INPUT ===== */
@@ -95,10 +101,9 @@ input{
   width:100%;
   padding:10px;
   background:var(--screen);
-  border:3px solid #000;
-  color:var(--green);
+  border:1px solid var(--border);
+  color:var(--text);
   font-family:inherit;
-  font-size:18px;
   margin-top:8px;
 }
 
@@ -107,16 +112,15 @@ input{
 .panel{
   margin-top:15px;
   background:var(--screen);
-  border:5px solid #000;
+  border:1px solid var(--border);
   padding:12px;
-  color:var(--green);
 }
 
-/* ===== DISPLAY TEXT ===== */
+/* ===== TEXT ===== */
 
 .balance,
 #payout{
-  font-size:22px;
+  font-size:18px;
 }
 
 </style>
@@ -126,7 +130,7 @@ input{
 
 <div class="container">
 
-<h1>▌ CURRENCY EXCHANGE ▌</h1>
+<h1>CURRENCY EXCHANGE</h1>
 
 <button onclick="facebookLogin()">LOGIN</button>
 
@@ -150,18 +154,18 @@ input{
 <div class="panel">
 
 ADD FUNDS
-
-<input type="number" id="fundInput" placeholder="USD"/>
+<input type="number" id="fundInput" placeholder="USD Amount"/>
 <button onclick="addFunds()">ADD</button>
 
+<div style="margin-top:8px;">
 BALANCE: $<span id="balance">0</span>
+</div>
 
 </div>
 
 <div class="panel">
 
 DAILY PAYOUT (30%)
-
 <div id="payout">$0</div>
 <p>JPMorgan Chase & Co.</p>
 
@@ -234,7 +238,7 @@ USDKRW:r.KRW
 
 }
 
-/* ===== UPDATE DISPLAY ===== */
+/* ===== UPDATE UI ===== */
 
 function updateTrades(){
 
@@ -265,7 +269,7 @@ previous[pair]=simulated
 
 }
 
-/* ===== FUNDS ===== */
+/* ===== ADD FUNDS ===== */
 
 async function addFunds(){
 
@@ -282,7 +286,6 @@ body:JSON.stringify({amount})
 })
 
 balance+=amount
-
 document.getElementById("balance").innerText=
 balance.toFixed(2)
 
@@ -292,7 +295,7 @@ balance.toFixed(2)
 
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-alert("AI ACTIVE")
+alert("AI ENGINE ACTIVE")
 }
 
 /* ===== DISTRIBUTION ===== */
