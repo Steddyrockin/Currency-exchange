@@ -103,7 +103,6 @@ padding:20px;
 <strong>DEPOSIT</strong>
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
 <button onclick="depositFunds()">DEPOSIT</button>
-<div>BALANCE: $<span id="balance">0</span></div>
 </div>
 
 <div class="panel">
@@ -122,16 +121,10 @@ padding:20px;
 
 const API = "http://localhost:4000/api"
 
-let balance = 0
-let startOfDayBalance = 0
-let initialDeposit = 0
-let totalEarned = 0
-
 let assets = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
 "USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW",
-"XAUUSD","XAGUSD",
-"USOIL","NGAS"
+"XAUUSD","XAGUSD","USOIL","NGAS"
 ]
 
 let previous = {}
@@ -179,7 +172,6 @@ const data = await res.json()
 const r = data.rates
 
 prices = {
-
 EURUSD:1/r.EUR,
 USDJPY:r.JPY,
 GBPUSD:1/r.GBP,
@@ -191,15 +183,10 @@ EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD,
 EURCHF:r.CHF/r.EUR,
 USDKRW:r.KRW,
-
-// Metals
 XAUUSD:2000 + (Math.random()-0.5)*10,
 XAGUSD:25 + (Math.random()-0.5)*0.5,
-
-// Energy
 USOIL:75 + (Math.random()-0.5)*2,
 NGAS:3 + (Math.random()-0.5)*0.1
-
 }
 
 }catch(e){}
@@ -244,24 +231,9 @@ try{
 const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
-balance = data.balance || 0
-document.getElementById("balance").innerText =
-balance.toFixed(2)
-
-if(initialDeposit === 0){
-initialDeposit = balance
-}
-
-totalEarned = balance - initialDeposit
-if(totalEarned < 0) totalEarned = 0
-
-if(startOfDayBalance === 0){
-startOfDayBalance = balance
-}
-
-const dailyProfit = balance - startOfDayBalance
-
+const dailyProfit = data.dailyProfit || 0
 let payout = 0
+
 if(dailyProfit > 0){
 payout = dailyProfit * 0.30
 }
@@ -270,7 +242,7 @@ document.getElementById("payout").innerText =
 "$" + payout.toFixed(2)
 
 document.getElementById("totalEarned").innerText =
-"$" + totalEarned.toFixed(2)
+"$" + (data.totalEarned || 0).toFixed(2)
 
 }catch(e){}
 
@@ -289,34 +261,15 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({amount})
 })
 
-balance += amount
-document.getElementById("balance").innerText =
-balance.toFixed(2)
+runAI()
 
 input.value=""
-
-// AUTO START AI
-runAI()
 
 }
 
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-console.log("AI Engine Running")
 }
-
-function resetDaily(){
-startOfDayBalance = balance
-}
-
-setInterval(()=>{
-
-const now = new Date()
-if(now.getHours() === 23 && now.getMinutes() === 59){
-resetDaily()
-}
-
-},60000)
 
 </script>
 
