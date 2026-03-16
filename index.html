@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -15,7 +15,9 @@
 --text:#000;
 }
 
-*{box-sizing:border-box;}
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -25,31 +27,57 @@ color:var(--text);
 font-family:"JetBrains Mono",monospace;
 }
 
-.container{max-width:1000px;margin:auto;}
+.container{
+max-width:1000px;
+margin:auto;
+}
 
 h1{
 font-size:28px;
 letter-spacing:2px;
 border-bottom:1px solid black;
 padding-bottom:10px;
+margin-bottom:30px;
 }
 
-table{
-width:100%;
+/* PANELS */
+
+.panel{
 margin-top:30px;
-border-collapse:collapse;
+border:1px solid black;
+padding:25px;
+text-align:center;
 }
 
-th,td{
-padding:12px;
-border-bottom:1px solid black;
-font-size:14px;
-color:black;
+.panel strong{
+display:block;
+margin-bottom:12px;
+letter-spacing:1px;
 }
+
+.panel p{
+margin:0;
+font-size:18px;
+}
+
+/* INPUT */
+
+input{
+width:100%;
+padding:12px;
+background:black;
+border:1px solid black;
+color:white;
+margin-top:10px;
+font-family:inherit;
+text-align:center;
+}
+
+/* BUTTON */
 
 button{
 width:100%;
-margin-top:15px;
+margin-top:12px;
 padding:12px;
 background:black;
 color:white;
@@ -63,20 +91,24 @@ background:white;
 color:black;
 }
 
-input{
+/* TABLE */
+
+table{
 width:100%;
-padding:12px;
-background:black;
-border:1px solid black;
-color:white;
-margin-top:10px;
-font-family:inherit;
+margin-top:30px;
+border-collapse:collapse;
+table-layout:fixed;
 }
 
-.panel{
-margin-top:40px;
-border:1px solid black;
-padding:20px;
+th,td{
+padding:14px;
+border-bottom:1px solid black;
+font-size:14px;
+text-align:center;
+}
+
+th{
+letter-spacing:1px;
 }
 
 </style>
@@ -88,15 +120,22 @@ padding:20px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<!-- 🔝 DEPOSIT -->
+<!-- DEPOSIT -->
+
 <div class="panel">
+
 <strong>DEPOSIT</strong>
+
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
+
 <button onclick="depositFunds()">DEPOSIT</button>
+
 </div>
 
-<!-- 📊 TABLE -->
+<!-- TABLE -->
+
 <table>
+
 <thead>
 <tr>
 <th>ASSET</th>
@@ -105,25 +144,39 @@ padding:20px;
 <th>NET %</th>
 </tr>
 </thead>
+
 <tbody id="tradeTable"></tbody>
+
 </table>
 
-<!-- 🔄 ALLOCATED -->
+<!-- ALLOCATED -->
+
 <div class="panel">
+
 <strong>ALLOCATED (IN CIRCULATION)</strong>
+
 <p id="allocatedAmount">$0</p>
+
 </div>
 
-<!-- 📈 DAILY PAYOUT -->
+<!-- DAILY PAYOUT -->
+
 <div class="panel">
+
 <strong>DAILY PAYOUT (30% OF PROFIT)</strong>
+
 <p id="payout">$0</p>
+
 </div>
 
-<!-- 🏆 TOTAL EARNED -->
+<!-- TOTAL EARNED -->
+
 <div class="panel">
+
 <strong>TOTAL AMOUNT EARNED (LIFETIME)</strong>
+
 <p id="totalEarned">$0</p>
+
 </div>
 
 </div>
