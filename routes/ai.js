@@ -1,9 +1,13 @@
-const router = require("express").Router()
-const { runAI } = require("../services/ai")
+const express = require("express")
 
-router.post("/run", (req,res)=>{
-  runAI()
-  res.json({ success:true })
+const router = express.Router()
+
+router.post("/run",(req,res)=>{
+
+console.log("AI trading engine started")
+
+res.json({status:"running"})
+
 })
 
 module.exports = router
