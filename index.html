@@ -32,8 +32,6 @@ max-width:1000px;
 margin:auto;
 }
 
-/* CENTERED TITLE */
-
 h1{
 font-size:28px;
 letter-spacing:2px;
@@ -131,7 +129,7 @@ letter-spacing:1px;
 
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
 
-<button onclick="depositFunds()">ADD FUNDS</button>
+<button onclick="depositFunds()">SUBMIT</button>
 
 </div>
 
@@ -247,98 +245,4 @@ USDCAD:r.CAD,
 USDCHF:r.CHF,
 EURJPY:r.JPY/r.EUR,
 EURGBP:r.GBP/r.EUR,
-USDHKD:r.HKD,
-EURCHF:r.CHF/r.EUR,
-USDKRW:r.KRW,
-XAUUSD:2000 + (Math.random()-0.5)*10,
-XAGUSD:25 + (Math.random()-0.5)*0.5,
-USOIL:75 + (Math.random()-0.5)*2,
-NGAS:3 + (Math.random()-0.5)*0.1
-}
-
-}catch(e){}
-
-}
-
-function updateMarket(){
-
-Object.keys(prices).forEach(asset=>{
-
-const base = prices[asset]
-if(!base) return
-
-const simulated = base + (Math.random()-0.5)*base*0.0005
-
-document.getElementById(asset).innerText =
-simulated.toFixed(4)
-
-if(previous[asset]){
-
-const diff = simulated - previous[asset]
-const percent = (diff/previous[asset])*100
-
-const netCell = document.getElementById("net"+asset)
-
-netCell.innerText = percent.toFixed(3)+"%"
-
-if(percent > 0) netCell.style.color="green"
-else if(percent < 0) netCell.style.color="red"
-else netCell.style.color="black"
-
-}
-
-previous[asset] = simulated
-
-})
-
-}
-
-async function loadPortfolio(){
-
-try{
-
-const res = await fetch(API+"/portfolio")
-const data = await res.json()
-
-const dailyProfit = data.dailyProfit || 0
-let payout = dailyProfit > 0 ? dailyProfit * 0.30 : 0
-
-document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
-
-document.getElementById("totalEarned").innerText =
-"$" + (data.totalEarned || 0).toFixed(2)
-
-document.getElementById("allocatedAmount").innerText =
-"$" + (data.allocated || 0).toFixed(2)
-
-}catch(e){}
-
-}
-
-async function depositFunds(){
-
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
-
-if(!amount || amount<=0) return alert("Invalid amount")
-
-await fetch(API+"/stripe/deposit",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({amount})
-})
-
-runAI()
-input.value=""
-
-}
-
-async function runAI(){
-await fetch(API+"/ai/run",{method:"POST"})
-}
-
-</script>
-
-</body>
-</html>
+USDHKD:r.H
