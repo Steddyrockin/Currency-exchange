@@ -100,9 +100,9 @@ padding:20px;
 </table>
 
 <div class="panel">
-<strong>ADD FUNDS</strong>
+<strong>DEPOSIT</strong>
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
-<button onclick="addFunds()">ADD FUNDS</button>
+<button onclick="depositFunds()">DEPOSIT</button>
 <div>BALANCE: $<span id="balance">0</span></div>
 </div>
 
@@ -276,7 +276,7 @@ document.getElementById("totalEarned").innerText =
 
 }
 
-async function addFunds(){
+async function depositFunds(){
 
 const input = document.getElementById("fundInput")
 const amount = parseFloat(input.value)
@@ -295,6 +295,7 @@ balance.toFixed(2)
 
 input.value=""
 
+// AUTO START AI
 runAI()
 
 }
