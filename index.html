@@ -41,8 +41,6 @@ margin-bottom:30px;
 text-align:center;
 }
 
-/* PANELS */
-
 .panel{
 margin-top:30px;
 border:1px solid black;
@@ -61,8 +59,6 @@ margin:0;
 font-size:18px;
 }
 
-/* INPUT */
-
 input{
 width:100%;
 padding:12px;
@@ -73,8 +69,6 @@ margin-top:10px;
 font-family:inherit;
 text-align:center;
 }
-
-/* BUTTON */
 
 button{
 width:100%;
@@ -91,8 +85,6 @@ button:hover{
 background:white;
 color:black;
 }
-
-/* TABLE */
 
 table{
 width:100%;
@@ -170,7 +162,9 @@ let assets = [
 
 "XAUUSD","XAGUSD",
 
-"USOIL","BRENT","WTI","HEATOIL","GASOLINE","NGAS","NATGAS"
+"USOIL","BRENT","WTI","UKOIL",
+"HEATOIL","GASOLINE","DIESEL",
+"NGAS","NATGAS","PROPANE"
 
 ]
 
@@ -238,10 +232,15 @@ XAGUSD:25 + (Math.random()-0.5)*0.5,
 USOIL:75 + (Math.random()-0.5)*2,
 BRENT:80 + (Math.random()-0.5)*2,
 WTI:76 + (Math.random()-0.5)*2,
+UKOIL:81 + (Math.random()-0.5)*2,
+
 HEATOIL:2.5 + (Math.random()-0.5)*0.1,
 GASOLINE:2.3 + (Math.random()-0.5)*0.1,
+DIESEL:2.7 + (Math.random()-0.5)*0.1,
+
 NGAS:3 + (Math.random()-0.5)*0.1,
-NATGAS:3.1 + (Math.random()-0.5)*0.1
+NATGAS:3.1 + (Math.random()-0.5)*0.1,
+PROPANE:1.2 + (Math.random()-0.5)*0.05
 
 }
 
