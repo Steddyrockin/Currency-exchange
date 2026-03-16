@@ -1,80 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Currency Exchange</title>
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
 <style>
 
+/* ===== 1980s TRADING CALCULATOR ===== */
+
 :root{
---bg:#000;
---text:#fff;
+  --case:#1a1a1a;
+  --screen:#0b1a0b;
+  --green:#39ff14;
+  --button:#2b2b2b;
 }
 
 *{box-sizing:border-box;}
 
 body{
-margin:0;
-padding:40px;
-background:var(--bg);
-color:var(--text);
-font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
+  margin:0;
+  background:#111;
+  display:flex;
+  justify-content:center;
+  padding:25px;
+  font-family:'VT323', monospace;
 }
 
-.container{max-width:1000px;margin:auto;}
+.container{
+  width:900px;
+  background:var(--case);
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 0 0 6px #000 inset;
+}
+
+/* ===== HEADER ===== */
 
 h1{
-font-size:28px;
-letter-spacing:2px;
-border-bottom:1px solid white;
-padding-bottom:10px;
+  text-align:center;
+  color:var(--green);
+  letter-spacing:4px;
+  font-size:28px;
+  margin:0 0 15px 0;
 }
 
+/* ===== LCD SCREEN ===== */
+
+.screen{
+  background:var(--screen);
+  border:5px solid #000;
+  padding:15px;
+  color:var(--green);
+}
+
+/* ===== TABLE ===== */
+
 table{
-width:100%;
-margin-top:30px;
-border-collapse:collapse;
+  width:100%;
+  border-collapse:collapse;
+  font-size:16px;
 }
 
 th,td{
-padding:10px;
-border-bottom:1px solid white;
+  border-bottom:1px solid #0f0;
+  padding:5px;
 }
+
+/* ===== BUTTONS ===== */
 
 button{
-width:100%;
-margin-top:15px;
-padding:12px;
-background:black;
-color:white;
-border:1px solid white;
-cursor:pointer;
-font-family:inherit;
+  width:100%;
+  margin-top:10px;
+  padding:14px;
+  background:var(--button);
+  color:var(--green);
+  border:3px solid #000;
+  font-family:inherit;
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
 }
 
-button:hover{
-background:white;
-color:black;
+button:active{
+  transform:translateY(2px);
+  box-shadow:inset 2px 2px 3px #000;
 }
+
+/* ===== INPUT ===== */
 
 input{
-width:100%;
-padding:12px;
-background:black;
-border:1px solid white;
-color:white;
-margin-top:10px;
-font-family:inherit;
+  width:100%;
+  padding:10px;
+  background:var(--screen);
+  border:3px solid #000;
+  color:var(--green);
+  font-family:inherit;
+  font-size:18px;
+  margin-top:8px;
 }
 
+/* ===== PANELS ===== */
+
 .panel{
-margin-top:40px;
-border:1px solid white;
-padding:20px;
+  margin-top:15px;
+  background:var(--screen);
+  border:5px solid #000;
+  padding:12px;
+  color:var(--green);
+}
+
+/* ===== DISPLAY TEXT ===== */
+
+.balance,
+#payout{
+  font-size:22px;
 }
 
 </style>
@@ -84,69 +126,77 @@ padding:20px;
 
 <div class="container">
 
-<h1>CURRENCY EXCHANGE</h1>
+<h1>▌ CURRENCY EXCHANGE ▌</h1>
 
-<p style="margin-top:10px; font-size:14px;">
-Make money all day. 
-</p>
+<button onclick="facebookLogin()">LOGIN</button>
 
-<button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
+<div class="screen">
 
 <table>
 <thead>
 <tr>
-<th>TRADE</th>
+<th>PAIR</th>
 <th>VALUE</th>
-<th>CHANGE</th>
-<th>NET %</th>
-<th>ALLOCATED</th>
+<th>Δ</th>
+<th>%</th>
+<th>ALLOC</th>
 </tr>
 </thead>
 <tbody id="tradeTable"></tbody>
 </table>
 
-<div class="panel">
-<strong>ADD FUNDS</strong>
-<input type="number" id="fundInput" placeholder="Enter USD amount"/>
-<button onclick="addFunds()">ADD FUNDS</button>
-<div>BALANCE: $<span id="balance">0</span></div>
 </div>
 
 <div class="panel">
-<strong>DAILY PAYOUT (30%)</strong>
-<p id="payout">$0</p>
-<p><strong>JPMorgan Chase & Co.</strong></p>
+
+ADD FUNDS
+
+<input type="number" id="fundInput" placeholder="USD"/>
+<button onclick="addFunds()">ADD</button>
+
+BALANCE: $<span id="balance">0</span>
+
 </div>
 
-<button onclick="runAI()">RUN AI TRADING</button>
-<button onclick="runDistribution()">RUN DISTRIBUTION</button>
+<div class="panel">
+
+DAILY PAYOUT (30%)
+
+<div id="payout">$0</div>
+<p>JPMorgan Chase & Co.</p>
+
+</div>
+
+<button onclick="runAI()">RUN AI</button>
+<button onclick="runDistribution()">DISTRIBUTE</button>
 
 </div>
 
 <script>
 
-const API = "http://localhost:4000/api"
+const API="http://localhost:4000/api"
 
-let balance = 0
-let trades = [
+let balance=0
+
+const trades=[
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
 "USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
 ]
 
-let previous = {}
-let prices = {}
+let previous={}
+let prices={}
 
+/* ===== BUILD TABLE ===== */
 
-// Build Table Dynamically
 function buildTable(){
 
-const table = document.getElementById("tradeTable")
+const table=document.getElementById("tradeTable")
 
 trades.forEach((pair,i)=>{
 
-const row = document.createElement("tr")
+const row=document.createElement("tr")
 
-row.innerHTML = `
+row.innerHTML=`
 <td>${pair}</td>
 <td id="${pair}">--</td>
 <td id="change${pair}">-</td>
@@ -160,17 +210,15 @@ table.appendChild(row)
 
 }
 
+/* ===== LOAD FOREX ===== */
 
-// Load Market Data (Throttled)
 async function loadForex(){
 
-try{
+const res=await fetch("https://api.exchangerate.host/latest?base=USD")
+const data=await res.json()
+const r=data.rates
 
-const res = await fetch("https://api.exchangerate.host/latest?base=USD")
-const data = await res.json()
-const r = data.rates
-
-prices = {
+prices={
 EURUSD:1/r.EUR,
 USDJPY:r.JPY,
 GBPUSD:1/r.GBP,
@@ -184,84 +232,48 @@ EURCHF:r.CHF/r.EUR,
 USDKRW:r.KRW
 }
 
-}catch(e){}
-
 }
 
+/* ===== UPDATE DISPLAY ===== */
 
-// Update UI Every Second
 function updateTrades(){
 
 Object.keys(prices).forEach(pair=>{
 
-const base = prices[pair]
-if(!base) return
+const base=prices[pair]
+const simulated=base+(Math.random()-0.5)*base*0.0005
 
-const simulated = base + (Math.random()-0.5)*base*0.0005
-
-document.getElementById(pair).innerText =
+document.getElementById(pair).innerText=
 simulated.toFixed(4)
 
 if(previous[pair]){
 
-const diff = simulated - previous[pair]
-const percent = (diff/previous[pair])*100
+const diff=simulated-previous[pair]
+const percent=(diff/previous[pair])*100
 
-document.getElementById("change"+pair).innerText =
+document.getElementById("change"+pair).innerText=
 diff.toFixed(5)
 
-document.getElementById("net"+pair).innerText =
+document.getElementById("net"+pair).innerText=
 percent.toFixed(3)+"%"
 
 }
 
-previous[pair] = simulated
+previous[pair]=simulated
 
 })
 
 }
 
+/* ===== FUNDS ===== */
 
-// Portfolio Sync
-async function loadPortfolio(){
-
-try{
-
-const res = await fetch(API + "/portfolio")
-const data = await res.json()
-
-balance = data.balance || 0
-
-document.getElementById("balance").innerText =
-balance.toFixed(2)
-
-const profit = data.dailyProfit || 0
-const payout = profit * 0.30
-
-document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
-
-if(data.allocations){
-
-data.allocations.forEach((amt,i)=>{
-const cell = document.getElementById("alloc"+(i+1))
-if(cell) cell.innerText = "$"+amt.toFixed(2)
-})
-
-}
-
-}catch(e){}
-
-}
-
-
-// Add Funds
 async function addFunds(){
 
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
+const amount=parseFloat(
+document.getElementById("fundInput").value
+)
 
-if(!amount || amount<=0) return alert("Invalid amount")
+if(!amount||amount<=0) return
 
 await fetch(API+"/stripe/deposit",{
 method:"POST",
@@ -269,32 +281,30 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({amount})
 })
 
-balance += amount
-document.getElementById("balance").innerText =
+balance+=amount
+
+document.getElementById("balance").innerText=
 balance.toFixed(2)
 
-input.value=""
-
 }
 
+/* ===== AI ===== */
 
-// AI Engine
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-alert("AI Engine Started")
+alert("AI ACTIVE")
 }
 
+/* ===== DISTRIBUTION ===== */
 
-// Distribution
 async function runDistribution(){
 
-if(balance<=0) return alert("No funds")
+if(balance<=0) return
 
-const rows = trades.length
-const allocation = balance/rows
+const allocation=balance/trades.length
 
-for(let i=1;i<=rows;i++){
-document.getElementById("alloc"+i).innerText =
+for(let i=1;i<=trades.length;i++){
+document.getElementById("alloc"+i).innerText=
 "$"+allocation.toFixed(2)
 }
 
@@ -302,14 +312,14 @@ await fetch(API+"/portfolio/distribute",{method:"POST"})
 
 }
 
+/* ===== FACEBOOK LOGIN ===== */
 
-// Facebook Login
-window.fbAsyncInit = function(){
+window.fbAsyncInit=function(){
 FB.init({
-appId:'FACEBOOK_APP_ID',
+appId:"FACEBOOK_APP_ID",
 cookie:true,
 xfbml:true,
-version:'v19.0'
+version:"v19.0"
 })
 }
 
@@ -325,20 +335,19 @@ body:JSON.stringify(response.authResponse)
 })
 }
 
+/* ===== INIT ===== */
 
-// INIT
 buildTable()
 loadForex()
-loadPortfolio()
 
-setInterval(loadForex,10000)     // market refresh
-setInterval(updateTrades,1000)   // UI refresh
-setInterval(loadPortfolio,60000)
+setInterval(loadForex,10000)
+setInterval(updateTrades,1000)
 
 </script>
 
-<script async defer crossorigin="anonymous"
-src="https://connect.facebook.net/en_US/sdk.js"></script>
+<script async defer
+src="https://connect.facebook.net/en_US/sdk.js">
+</script>
 
 </body>
 </html>
