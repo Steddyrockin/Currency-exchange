@@ -111,7 +111,11 @@ padding:20px;
 <div class="panel">
 <strong>DAILY PAYOUT (30% OF PROFIT)</strong>
 <p id="payout">$0</p>
-<p><strong>JPMorgan Chase & Co.</strong></p>
+</div>
+
+<div class="panel">
+<strong>TOTAL AMOUNT EARNED (LIFETIME)</strong>
+<p id="totalEarned">$0</p>
 </div>
 
 </div>
@@ -122,6 +126,8 @@ const API = "http://localhost:4000/api"
 
 let balance = 0
 let startOfDayBalance = 0
+let initialDeposit = 0
+let totalEarned = 0
 
 let assets = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
@@ -229,23 +235,35 @@ const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
 balance = data.balance || 0
-
 document.getElementById("balance").innerText =
 balance.toFixed(2)
 
+// Initial deposit tracking
+if(initialDeposit === 0){
+initialDeposit = balance
+}
+
+// Total Lifetime Earned
+totalEarned = balance - initialDeposit
+if(totalEarned < 0) totalEarned = 0
+
+// Daily Profit
 if(startOfDayBalance === 0){
 startOfDayBalance = balance
 }
 
-const profit = balance - startOfDayBalance
+const dailyProfit = balance - startOfDayBalance
 
 let payout = 0
-if(profit > 0){
-payout = profit * 0.30
+if(dailyProfit > 0){
+payout = dailyProfit * 0.30
 }
 
 document.getElementById("payout").innerText =
 "$" + payout.toFixed(2)
+
+document.getElementById("totalEarned").innerText =
+"$" + totalEarned.toFixed(2)
 
 }catch(e){}
 
