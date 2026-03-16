@@ -86,10 +86,6 @@ padding:20px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<p style="margin-top:10px; font-size:14px;">
-Make money all day.
-</p>
-
 <button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
 
 <table>
@@ -117,6 +113,14 @@ Make money all day.
 <p><strong>JPMorgan Chase & Co.</strong></p>
 </div>
 
+<div class="panel">
+<strong>SIMULATOR MODE</strong>
+<button onclick="toggleSimulator()">TOGGLE SIMULATOR</button>
+<div>MODE: <span id="simStatus">OFF</span></div>
+<div>SIM BALANCE: $<span id="simBalance">1000</span></div>
+<div>SIM PNL: $<span id="simPnl">0</span></div>
+</div>
+
 </div>
 
 <script>
@@ -125,6 +129,10 @@ const API = "http://localhost:4000/api"
 
 let balance = 0
 let startOfDayBalance = 0
+
+let simulatorOn = false
+let simBalance = 1000
+let simStartBalance = 1000
 
 let trades = [
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
@@ -136,11 +144,29 @@ let previous = {}
 let prices = {}
 
 function getDisplay(pair){
-
 if(pair==="XAUUSD") return "XAU/USD"
 if(pair==="XAGUSD") return "XAG/USD"
+return pair.substring(0,3)+"/"+pair.substring(3,6)
+}
 
-return pair.substring(0,3) + "/" + pair.substring(3,6)
+function buildTable(){
+
+const table = document.getElementById("tradeTable")
+
+trades.forEach(pair=>{
+
+const row = document.createElement("tr")
+
+row.innerHTML = `
+<td>${getDisplay(pair)}</td>
+<td id="${pair}">--</td>
+<td id="change${pair}">-</td>
+<td id="net${pair}">-</td>
+`
+
+table.appendChild(row)
+
+})
 
 }
 
@@ -164,35 +190,11 @@ EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD,
 EURCHF:r.CHF/r.EUR,
 USDKRW:r.KRW,
-
-// Metals (simulated — replace with real API if needed)
 XAUUSD:2000 + (Math.random()*20),
 XAGUSD:25 + (Math.random()*1)
-
 }
 
 }catch(e){}
-
-}
-
-function buildTable(){
-
-const table = document.getElementById("tradeTable")
-
-trades.forEach(pair=>{
-
-const row = document.createElement("tr")
-
-row.innerHTML = `
-<td>${getDisplay(pair)}</td>
-<td id="${pair}">--</td>
-<td id="change${pair}">-</td>
-<td id="net${pair}">-</td>
-`
-
-table.appendChild(row)
-
-})
 
 }
 
@@ -227,34 +229,34 @@ previous[pair] = simulated
 
 }
 
-async function loadPortfolio(){
+function toggleSimulator(){
 
-try{
+simulatorOn = !simulatorOn
+document.getElementById("simStatus").innerText =
+simulatorOn ? "ON" : "OFF"
 
-const res = await fetch(API + "/portfolio")
-const data = await res.json()
-
-balance = data.balance || 0
-
-document.getElementById("balance").innerText =
-balance.toFixed(2)
-
-if(startOfDayBalance === 0){
-startOfDayBalance = balance
 }
 
-const profit = balance - startOfDayBalance
+function runSimulator(){
 
-let payout = 0
+if(!simulatorOn) return
 
-if(profit > 0){
-payout = profit * 0.30
-}
+Object.keys(prices).forEach(()=>{
 
-document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
+const direction = Math.random() > 0.5 ? 1 : -1
+const change = (Math.random()*0.0005)*direction
+const tradeResult = simBalance * change
+simBalance += tradeResult
 
-}catch(e){}
+})
+
+const pnl = simBalance - simStartBalance
+
+document.getElementById("simBalance").innerText =
+simBalance.toFixed(2)
+
+document.getElementById("simPnl").innerText =
+pnl.toFixed(2)
 
 }
 
@@ -277,14 +279,12 @@ document.getElementById("balance").innerText =
 balance.toFixed(2)
 
 input.value=""
-
 runAI()
 
 }
 
 async function runAI(){
 await fetch(API+"/ai/run",{method:"POST"})
-console.log("AI Trading Started")
 }
 
 function resetDailyProfit(){
@@ -292,48 +292,22 @@ startOfDayBalance = balance
 }
 
 setInterval(()=>{
-
 const now = new Date()
-
-if(now.getHours() === 23 && now.getMinutes() === 59){
+if(now.getHours()===23 && now.getMinutes()===59){
 resetDailyProfit()
 }
-
 },60000)
-
-window.fbAsyncInit = function(){
-FB.init({
-appId:'FACEBOOK_APP_ID',
-cookie:true,
-xfbml:true,
-version:'v19.0'
-})
-}
-
-function facebookLogin(){
-FB.login(function(response){
-if(response.authResponse){
-fetch(API+"/auth/facebook",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(response.authResponse)
-})
-}
-})
-}
 
 buildTable()
 loadForex()
-loadPortfolio()
 
-setInterval(loadForex,10000)
-setInterval(updateTrades,1000)
-setInterval(loadPortfolio,60000)
+setInterval(()=>{
+loadForex()
+updateTrades()
+runSimulator()
+},1000)
 
 </script>
-
-<script async defer crossorigin="anonymous"
-src="https://connect.facebook.net/en_US/sdk.js"></script>
 
 </body>
 </html>
