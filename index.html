@@ -41,13 +41,14 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:15px;
+padding:12px;
 border-bottom:1px solid black;
+font-size:14px;
 }
 
 button{
 width:100%;
-margin-top:15px;
+margin-top:12px;
 padding:12px;
 background:black;
 color:white;
@@ -72,7 +73,7 @@ font-family:inherit;
 }
 
 .panel{
-margin-top:40px;
+margin-top:30px;
 border:1px solid black;
 padding:20px;
 }
@@ -143,10 +144,20 @@ let trades = [
 let previous = {}
 let prices = {}
 
+const symbols = {
+USD:"$", EUR:"€", GBP:"£", JPY:"¥",
+CAD:"C$", AUD:"A$", HKD:"HK$", KRW:"₩",
+CHF:"CHF",
+XAU:"XAU", XAG:"XAG"
+}
+
 function getDisplay(pair){
+
 if(pair==="XAUUSD") return "XAU/USD"
 if(pair==="XAGUSD") return "XAG/USD"
+
 return pair.substring(0,3)+"/"+pair.substring(3,6)
+
 }
 
 function buildTable(){
