@@ -137,6 +137,18 @@ let assets = [
 let previous = {}
 let prices = {}
 
+document.addEventListener("DOMContentLoaded", function(){
+
+buildTable()
+loadMarket()
+loadPortfolio()
+
+setInterval(loadMarket,10000)
+setInterval(updateMarket,1000)
+setInterval(loadPortfolio,60000)
+
+})
+
 function buildTable(){
 
 const table = document.getElementById("tradeTable")
@@ -254,4 +266,58 @@ if(dailyProfit > 0){
 payout = dailyProfit * 0.30
 }
 
-document.getElementById("payout
+document.getElementById("payout").innerText =
+"$" + payout.toFixed(2)
+
+document.getElementById("totalEarned").innerText =
+"$" + totalEarned.toFixed(2)
+
+}catch(e){}
+
+}
+
+async function addFunds(){
+
+const input = document.getElementById("fundInput")
+const amount = parseFloat(input.value)
+
+if(!amount || amount<=0) return alert("Invalid amount")
+
+await fetch(API+"/stripe/deposit",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({amount})
+})
+
+balance += amount
+document.getElementById("balance").innerText =
+balance.toFixed(2)
+
+input.value=""
+
+runAI()
+
+}
+
+async function runAI(){
+await fetch(API+"/ai/run",{method:"POST"})
+console.log("AI Engine Running")
+}
+
+function resetDaily(){
+startOfDayBalance = balance
+}
+
+setInterval(()=>{
+
+const now = new Date()
+if(now.getHours() === 23 && now.getMinutes() === 59){
+resetDaily()
+}
+
+},60000)
+
+</script>
+
+</body>
+</html>
