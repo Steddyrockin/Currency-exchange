@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Roboto+Mono&display=swap" rel="stylesheet">
@@ -25,7 +25,10 @@ color:var(--text);
 font-family:"JetBrains Mono","Roboto Mono","SF Mono",monospace;
 }
 
-.container{max-width:1000px;margin:auto;}
+.container{
+max-width:1000px;
+margin:auto;
+}
 
 h1{
 font-size:28px;
@@ -77,6 +80,16 @@ border:1px solid black;
 padding:20px;
 }
 
+.console{
+background:white;
+border:1px solid black;
+padding:15px;
+margin-top:15px;
+height:220px;
+overflow:auto;
+font-size:12px;
+}
+
 </style>
 </head>
 
@@ -86,10 +99,9 @@ padding:20px;
 
 <h1>CURRENCY EXCHANGE</h1>
 
-<p style="margin-top:10px; font-size:14px;">
-Make money all day. 
+<p style="margin-top:10px;font-size:14px;">
+Make money all day.
 </p>
-
 
 <button onclick="facebookLogin()">LOGIN WITH FACEBOOK</button>
 
@@ -107,47 +119,69 @@ Make money all day.
 </table>
 
 <div class="panel">
+
 <strong>ADD FUNDS</strong>
+
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
+
 <button onclick="addFunds()">ADD FUNDS</button>
+
 <div>BALANCE: $<span id="balance">0</span></div>
+
 </div>
 
 <div class="panel">
+
 <strong>DAILY PAYOUT (30%)</strong>
+
 <p id="payout">$0</p>
+
 <p><strong>JPMorgan Chase & Co.</strong></p>
+
 </div>
 
 <button onclick="runAI()">RUN AI TRADING</button>
+
 <button onclick="runDistribution()">RUN DISTRIBUTION</button>
+
+
+<div class="panel">
+
+<strong>AI CODE VISUALIZER</strong>
+
+<pre id="codeViewer" class="console"></pre>
+
+</div>
 
 </div>
 
 <script>
 
-const API = "http://localhost:4000/api"
+const API="http://localhost:4000/api"
 
-let balance = 0
-let trades = [
+let balance=0
+
+let trades=[
 "EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
 "USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW"
 ]
 
-let previous = {}
-let prices = {}
+let previous={}
+let prices={}
+let codeLines=[]
 
 
-// Build Table Dynamically
+// Build Trade Table
+
 function buildTable(){
 
-const table = document.getElementById("tradeTable")
+const table=document.getElementById("tradeTable")
 
 trades.forEach((pair,i)=>{
 
-const row = document.createElement("tr")
+const row=document.createElement("tr")
 
-row.innerHTML = `
+row.innerHTML=`
 <td>${pair}</td>
 <td id="${pair}">--</td>
 <td id="change${pair}">-</td>
@@ -162,16 +196,19 @@ table.appendChild(row)
 }
 
 
-// Load Market Data (Throttled)
+// Load Market Data
+
 async function loadForex(){
 
 try{
 
-const res = await fetch("https://api.exchangerate.host/latest?base=USD")
-const data = await res.json()
-const r = data.rates
+const res=await fetch("https://api.exchangerate.host/latest?base=USD")
 
-prices = {
+const data=await res.json()
+
+const r=data.rates
+
+prices={
 EURUSD:1/r.EUR,
 USDJPY:r.JPY,
 GBPUSD:1/r.GBP,
@@ -190,33 +227,35 @@ USDKRW:r.KRW
 }
 
 
-// Update UI Every Second
+// Dynamic Trade Simulation
+
 function updateTrades(){
 
 Object.keys(prices).forEach(pair=>{
 
-const base = prices[pair]
-if(!base) return
+const base=prices[pair]
+if(!base)return
 
-const simulated = base + (Math.random()-0.5)*base*0.0005
+const simulated=base+(Math.random()-0.5)*base*0.0005
 
-document.getElementById(pair).innerText =
+document.getElementById(pair).innerText=
 simulated.toFixed(4)
 
 if(previous[pair]){
 
-const diff = simulated - previous[pair]
-const percent = (diff/previous[pair])*100
+const diff=simulated-previous[pair]
 
-document.getElementById("change"+pair).innerText =
+const percent=(diff/previous[pair])*100
+
+document.getElementById("change"+pair).innerText=
 diff.toFixed(5)
 
-document.getElementById("net"+pair).innerText =
+document.getElementById("net"+pair).innerText=
 percent.toFixed(3)+"%"
 
 }
 
-previous[pair] = simulated
+previous[pair]=simulated
 
 })
 
@@ -224,29 +263,35 @@ previous[pair] = simulated
 
 
 // Portfolio Sync
+
 async function loadPortfolio(){
 
 try{
 
-const res = await fetch(API + "/portfolio")
-const data = await res.json()
+const res=await fetch(API+"/portfolio")
 
-balance = data.balance || 0
+const data=await res.json()
 
-document.getElementById("balance").innerText =
+balance=data.balance||0
+
+document.getElementById("balance").innerText=
 balance.toFixed(2)
 
-const profit = data.dailyProfit || 0
-const payout = profit * 0.30
+const profit=data.dailyProfit||0
 
-document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
+const payout=profit*0.30
+
+document.getElementById("payout").innerText=
+"$"+payout.toFixed(2)
 
 if(data.allocations){
 
 data.allocations.forEach((amt,i)=>{
-const cell = document.getElementById("alloc"+(i+1))
-if(cell) cell.innerText = "$"+amt.toFixed(2)
+
+const cell=document.getElementById("alloc"+(i+1))
+
+if(cell)cell.innerText="$"+amt.toFixed(2)
+
 })
 
 }
@@ -257,21 +302,28 @@ if(cell) cell.innerText = "$"+amt.toFixed(2)
 
 
 // Add Funds
+
 async function addFunds(){
 
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
+const input=document.getElementById("fundInput")
 
-if(!amount || amount<=0) return alert("Invalid amount")
+const amount=parseFloat(input.value)
+
+if(!amount||amount<=0)return alert("Invalid amount")
 
 await fetch(API+"/stripe/deposit",{
+
 method:"POST",
+
 headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify({amount})
+
 })
 
-balance += amount
-document.getElementById("balance").innerText =
+balance+=amount
+
+document.getElementById("balance").innerText=
 balance.toFixed(2)
 
 input.value=""
@@ -279,24 +331,32 @@ input.value=""
 }
 
 
-// AI Engine
+// Run AI
+
 async function runAI(){
+
 await fetch(API+"/ai/run",{method:"POST"})
+
 alert("AI Engine Started")
+
 }
 
 
-// Distribution
+// Distribute Portfolio
+
 async function runDistribution(){
 
-if(balance<=0) return alert("No funds")
+if(balance<=0)return alert("No funds")
 
-const rows = trades.length
-const allocation = balance/rows
+const rows=trades.length
+
+const allocation=balance/rows
 
 for(let i=1;i<=rows;i++){
-document.getElementById("alloc"+i).innerText =
+
+document.getElementById("alloc"+i).innerText=
 "$"+allocation.toFixed(2)
+
 }
 
 await fetch(API+"/portfolio/distribute",{method:"POST"})
@@ -304,37 +364,95 @@ await fetch(API+"/portfolio/distribute",{method:"POST"})
 }
 
 
+// AI Code Visualizer
+
+function updateVisualizer(){
+
+const time=new Date().toLocaleTimeString()
+
+const samples=[
+
+`[${time}] Loading forex market data`,
+`[${time}] Calculating volatility`,
+`[${time}] Running AI model`,
+`[${time}] Evaluating arbitrage opportunity`,
+`[${time}] Executing trade`,
+`[${time}] Updating portfolio`,
+`[${time}] Rebalancing allocation`,
+`[${time}] Syncing profit data`
+
+]
+
+const line=samples[Math.floor(Math.random()*samples.length)]
+
+codeLines.push(line)
+
+if(codeLines.length>25){
+codeLines.shift()
+}
+
+document.getElementById("codeViewer").textContent=
+codeLines.join("\n")
+
+}
+
+
 // Facebook Login
-window.fbAsyncInit = function(){
+
+window.fbAsyncInit=function(){
+
 FB.init({
+
 appId:'FACEBOOK_APP_ID',
+
 cookie:true,
+
 xfbml:true,
+
 version:'v19.0'
+
 })
+
 }
 
 function facebookLogin(){
+
 FB.login(function(response){
+
 if(response.authResponse){
+
 fetch(API+"/auth/facebook",{
+
 method:"POST",
+
 headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify(response.authResponse)
+
 })
+
 }
+
 })
+
 }
 
 
 // INIT
+
 buildTable()
+
 loadForex()
+
 loadPortfolio()
 
-setInterval(loadForex,10000)     // market refresh
-setInterval(updateTrades,1000)   // UI refresh
+setInterval(loadForex,10000)
+
+setInterval(updateTrades,1000)
+
 setInterval(loadPortfolio,60000)
+
+setInterval(updateVisualizer,1000)
 
 </script>
 
