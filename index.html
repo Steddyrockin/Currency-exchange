@@ -7,6 +7,7 @@
 <title>Currency Exchange</title>
 
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
 
 <style>
 
@@ -116,6 +117,23 @@ background:white;
 color:black;
 }
 
+/* Apple Pay */
+
+.apple-pay-btn{
+margin-top:10px;
+padding:14px;
+background:black;
+color:white;
+border:1px solid black;
+cursor:pointer;
+font-size:16px;
+}
+
+.apple-pay-btn:hover{
+background:white;
+color:black;
+}
+
 table{
 width:100%;
 margin-top:30px;
@@ -176,7 +194,7 @@ opacity:0.5;
 <h1>CURRENCY EXCHANGE</h1>
 
 <div class="panel">
-<strong>GLOBAL DOLLAR INDEX</strong>
+<strong>GLOBAL DOLLAR</strong>
 <p id="liveGlobal">$0</p>
 </div>
 
@@ -184,15 +202,21 @@ opacity:0.5;
 <strong>AI MARKET SYSTEM</strong>
 <p class="blurb">
 This platform monitors global currency, metals, and energy markets in real time.
-The system continuously evaluates price movements across multiple assets and
-executes automated trading strategies designed to capture market inefficiencies.
+The system continuously evaluates price movements across multiple assets.
 </p>
 </div>
 
 <div class="panel">
 <strong>ADD FUNDS</strong>
+
 <input type="number" id="fundInput" placeholder="Enter USD amount"/>
+
 <button onclick="depositFunds()">SUBMIT</button>
+
+<button id="applePayBtn" class="apple-pay-btn" style="display:none;">
+ Pay
+</button>
+
 </div>
 
 <table>
@@ -226,7 +250,6 @@ executes automated trading strategies designed to capture market inefficiencies.
 
 <!-- GLOBAL VIEW -->
 <div id="globalView" class="view">
-
 <h1>GLOBAL DOLLAR</h1>
 
 <div class="panel">
@@ -248,7 +271,6 @@ executes automated trading strategies designed to capture market inefficiencies.
 
 <!-- TRANSACTIONS -->
 <div id="transactionsView" class="view">
-
 <h1>TRANSACTIONS</h1>
 
 <table>
@@ -262,7 +284,6 @@ executes automated trading strategies designed to capture market inefficiencies.
 </thead>
 <tbody id="txTable"></tbody>
 </table>
-
 </div>
 
 <!-- FOOTER -->
@@ -277,8 +298,9 @@ executes automated trading strategies designed to capture market inefficiencies.
 <script>
 
 const API = "http://localhost:4000/api"
+const stripe = Stripe("pk_test_YOUR_PUBLIC_KEY") // replace
 
-let assets = ["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW","XAUUSD","XAGUSD","USOIL","BRENT","WTI","UKOIL","HEATOIL","GASOLINE","DIESEL","NGAS","NATGAS","PROPANE"]
+let assets = ["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW","XAUUSD","XAGUSD","USOIL","BRENT","WTI"]
 
 let previous = {}
 let prices = {}
@@ -290,6 +312,7 @@ document.addEventListener("DOMContentLoaded", function(){
 buildTable()
 loadMarket()
 loadPortfolio()
+setupApplePay()
 
 setInterval(loadMarket,10000)
 setInterval(updateMarket,1000)
@@ -330,7 +353,6 @@ table.appendChild(row)
 }
 
 async function loadMarket(){
-try{
 const res=await fetch("https://api.exchangerate.host/latest?base=USD")
 const data=await res.json()
 const r=data.rates
@@ -340,22 +362,14 @@ EURUSD:1/r.EUR, USDJPY:r.JPY, GBPUSD:1/r.GBP,
 AUDUSD:1/r.AUD, USDCAD:r.CAD, USDCHF:r.CHF,
 EURJPY:r.JPY/r.EUR, EURGBP:r.GBP/r.EUR,
 USDHKD:r.HKD, EURCHF:r.CHF/r.EUR, USDKRW:r.KRW,
-
-XAUUSD:2000+(Math.random()-0.5)*10,
-XAGUSD:25+(Math.random()-0.5)*0.5,
-USOIL:75+(Math.random()-0.5)*2,
-BRENT:80+(Math.random()-0.5)*2,
-WTI:76+(Math.random()-0.5)*2
+XAUUSD:2000+(Math.random()-0.5)*10
 }
-}catch(e){console.error(e)}
 }
 
 function updateMarket(){
 
 Object.keys(prices).forEach(asset=>{
 const base=prices[asset]
-if(!base) return
-
 const simulated=previous[asset]
 ? previous[asset]+(Math.random()-0.5)*base*0.0005
 : base
@@ -396,43 +410,78 @@ updateGlobalUI()
 }
 
 function updateGlobalUI(){
-document.getElementById("liveGlobal").innerText="$"+globalDollar.toFixed(2)
-document.getElementById("globalValue").innerText="$"+globalDollar.toFixed(2)
+liveGlobal.innerText="$"+globalDollar.toFixed(2)
+globalValue.innerText="$"+globalDollar.toFixed(2)
 
 const change=globalHistory.length>1?globalDollar-globalHistory[0]:0
 
-document.getElementById("netFlow").innerText=
-(change>=0?"+":"")+change.toFixed(2)
+netFlow.innerText=(change>=0?"+":"")+change.toFixed(2)
+systemProfit.innerText=((change/globalHistory[0])*100||0).toFixed(2)+"%"
+}
 
-document.getElementById("systemProfit").innerText=
-((change/globalHistory[0])*100||0).toFixed(2)+"%"
+async function setupApplePay(){
+
+const paymentRequest = stripe.paymentRequest({
+country:'US',
+currency:'usd',
+total:{label:'Deposit',amount:1000}
+})
+
+const result = await paymentRequest.canMakePayment()
+
+if(result){
+applePayBtn.style.display="block"
+
+applePayBtn.onclick=()=>{
+const amount=parseFloat(fundInput.value)||10
+
+paymentRequest.update({
+total:{label:'Deposit',amount:Math.round(amount*100)}
+})
+
+paymentRequest.show()
+}
+
+paymentRequest.on('paymentmethod', async (ev)=>{
+
+const amount=parseFloat(fundInput.value)||10
+
+const res=await fetch(API+"/stripe/apple-pay",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({amount})
+})
+
+const {clientSecret}=await res.json()
+
+const {error}=await stripe.confirmCardPayment(clientSecret,{
+payment_method:ev.paymentMethod.id
+},{handleActions:false})
+
+if(error){
+ev.complete('fail')
+}else{
+ev.complete('success')
+runAI()
+}
+})
+}
 }
 
 async function loadPortfolio(){
-try{
 const res=await fetch(API+"/portfolio")
 const data=await res.json()
 
-document.getElementById("payout").innerText=
-"$"+((data.dailyProfit||0)*0.30).toFixed(2)
-
-document.getElementById("totalEarned").innerText=
-"$"+(data.totalEarned||0).toFixed(2)
-
-document.getElementById("allocatedAmount").innerText=
-"$"+(data.allocated||0).toFixed(2)
-
-}catch(e){}
+payout.innerText="$"+((data.dailyProfit||0)*0.30).toFixed(2)
+totalEarned.innerText="$"+(data.totalEarned||0).toFixed(2)
+allocatedAmount.innerText="$"+(data.allocated||0).toFixed(2)
 }
 
 async function loadTransactions(){
-try{
 const res=await fetch(API+"/transactions")
 const data=await res.json()
 
-const table=document.getElementById("txTable")
-table.innerHTML=""
-
+txTable.innerHTML=""
 data.forEach(tx=>{
 const row=document.createElement("tr")
 row.innerHTML=`
@@ -440,10 +489,8 @@ row.innerHTML=`
 <td>$${tx.amount.toFixed(2)}</td>
 <td>${tx.status}</td>
 <td>${new Date(tx.time).toLocaleString()}</td>`
-table.appendChild(row)
+txTable.appendChild(row)
 })
-
-}catch(e){}
 }
 
 async function depositFunds(){
