@@ -177,7 +177,8 @@ text-decoration:underline;
 
 <!-- FOOTER -->
 <div class="footer">
-© 2026 Clean, Inc. | <a href="mailto:steddyrockin@gmail.com">Contact</a>
+© <span id="year"></span> Clean, Inc. | 
+<a href="mailto:steddyrockin@gmail.com">Contact</a>
 </div>
 
 </div>
@@ -192,6 +193,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 buildTable()
 setInterval(updateMarket,2000)
 loadTransactions()
+
+// ✅ AUTO YEAR
+document.getElementById("year").innerText = new Date().getFullYear();
 })
 
 function switchView(view,el){
