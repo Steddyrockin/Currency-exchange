@@ -54,7 +54,6 @@ padding:10px 18px;
 border:1px solid black;
 background:white;
 cursor:pointer;
-font-family:inherit;
 }
 
 .pill.active{
@@ -129,6 +128,32 @@ padding:14px;
 border-bottom:1px solid black;
 font-size:14px;
 text-align:center;
+}
+
+/* FOOTER */
+
+.footer{
+margin-top:50px;
+padding-top:20px;
+border-top:1px solid black;
+display:flex;
+justify-content:center;
+gap:10px;
+font-size:12px;
+letter-spacing:1px;
+}
+
+.footer a{
+text-decoration:none;
+color:black;
+}
+
+.footer a:hover{
+text-decoration:underline;
+}
+
+.divider{
+opacity:0.5;
 }
 
 </style>
@@ -240,6 +265,13 @@ executes automated trading strategies designed to capture market inefficiencies.
 
 </div>
 
+<!-- FOOTER -->
+<div class="footer">
+<span>© 2026 Clean, Inc.</span>
+<span class="divider">|</span>
+<a href="mailto:steddyrockin@gmail.com">Contact</a>
+</div>
+
 </div>
 
 <script>
@@ -251,12 +283,10 @@ let assets = ["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","USDCHF","EURJPY","EU
 let previous = {}
 let prices = {}
 
-// GLOBAL $
 let globalDollar = 0
 let globalHistory = []
 
 document.addEventListener("DOMContentLoaded", function(){
-
 buildTable()
 loadMarket()
 loadPortfolio()
@@ -264,11 +294,9 @@ loadPortfolio()
 setInterval(loadMarket,10000)
 setInterval(updateMarket,1000)
 setInterval(loadPortfolio,60000)
-
 })
 
 function switchView(view){
-
 document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"))
 document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"))
 
@@ -276,27 +304,23 @@ if(view==="market"){
 marketView.classList.add("active")
 document.querySelectorAll(".pill")[0].classList.add("active")
 }
-
 if(view==="global"){
 globalView.classList.add("active")
 document.querySelectorAll(".pill")[1].classList.add("active")
 updateGlobalUI()
 }
-
 if(view==="transactions"){
 transactionsView.classList.add("active")
 document.querySelectorAll(".pill")[2].classList.add("active")
 loadTransactions()
 }
-
 }
 
 function buildTable(){
-const table = document.getElementById("tradeTable")
-
+const table=document.getElementById("tradeTable")
 assets.forEach(asset=>{
-const row = document.createElement("tr")
-row.innerHTML = `
+const row=document.createElement("tr")
+row.innerHTML=`
 <td>${asset}</td>
 <td id="${asset}">--</td>
 <td id="change${asset}">-</td>
@@ -307,11 +331,11 @@ table.appendChild(row)
 
 async function loadMarket(){
 try{
-const res = await fetch("https://api.exchangerate.host/latest?base=USD")
-const data = await res.json()
-const r = data.rates
+const res=await fetch("https://api.exchangerate.host/latest?base=USD")
+const data=await res.json()
+const r=data.rates
 
-prices = {
+prices={
 EURUSD:1/r.EUR, USDJPY:r.JPY, GBPUSD:1/r.GBP,
 AUDUSD:1/r.AUD, USDCAD:r.CAD, USDCHF:r.CHF,
 EURJPY:r.JPY/r.EUR, EURGBP:r.GBP/r.EUR,
@@ -323,88 +347,79 @@ USOIL:75+(Math.random()-0.5)*2,
 BRENT:80+(Math.random()-0.5)*2,
 WTI:76+(Math.random()-0.5)*2
 }
-
 }catch(e){console.error(e)}
 }
 
 function updateMarket(){
 
 Object.keys(prices).forEach(asset=>{
-
-const base = prices[asset]
+const base=prices[asset]
 if(!base) return
 
-const simulated = previous[asset]
-? previous[asset] + (Math.random()-0.5)*base*0.0005
+const simulated=previous[asset]
+? previous[asset]+(Math.random()-0.5)*base*0.0005
 : base
 
-document.getElementById(asset).innerText = simulated.toFixed(4)
+document.getElementById(asset).innerText=simulated.toFixed(4)
 
 if(previous[asset]){
-const diff = simulated - previous[asset]
-const percent = (diff/previous[asset])*100
+const diff=simulated-previous[asset]
+const percent=(diff/previous[asset])*100
 
-document.getElementById("change"+asset).innerText = diff.toFixed(4)
+document.getElementById("change"+asset).innerText=diff.toFixed(4)
 
-const net = document.getElementById("net"+asset)
-net.innerText = percent.toFixed(3)+"%"
-net.style.color = percent>0?"green":percent<0?"red":"black"
+const net=document.getElementById("net"+asset)
+net.innerText=percent.toFixed(3)+"%"
+net.style.color=percent>0?"green":percent<0?"red":"black"
 }
 
-previous[asset] = simulated
-
+previous[asset]=simulated
 })
 
-// 🔥 GLOBAL CALCULATION
 calculateGlobalDollar()
-
 }
 
 function calculateGlobalDollar(){
-
-const vals = Object.values(prices)
+const vals=Object.values(prices)
 if(vals.length===0) return
 
-const norm = vals.map(v=>Math.log(v))
-const avg = norm.reduce((a,b)=>a+b,0)/norm.length
-const index = Math.exp(avg)
+const norm=vals.map(v=>Math.log(v))
+const avg=norm.reduce((a,b)=>a+b,0)/norm.length
+const index=Math.exp(avg)
 
-globalDollar = globalDollar===0 ? index : globalDollar + (index-globalDollar)*0.1
+globalDollar=globalDollar===0?index:globalDollar+(index-globalDollar)*0.1
 
 globalHistory.push(globalDollar)
 if(globalHistory.length>100) globalHistory.shift()
 
 updateGlobalUI()
-
 }
 
 function updateGlobalUI(){
+document.getElementById("liveGlobal").innerText="$"+globalDollar.toFixed(2)
+document.getElementById("globalValue").innerText="$"+globalDollar.toFixed(2)
 
-document.getElementById("liveGlobal").innerText = "$"+globalDollar.toFixed(2)
-document.getElementById("globalValue").innerText = "$"+globalDollar.toFixed(2)
+const change=globalHistory.length>1?globalDollar-globalHistory[0]:0
 
-const change = globalHistory.length>1 ? globalDollar-globalHistory[0] : 0
-
-document.getElementById("netFlow").innerText =
+document.getElementById("netFlow").innerText=
 (change>=0?"+":"")+change.toFixed(2)
 
-document.getElementById("systemProfit").innerText =
+document.getElementById("systemProfit").innerText=
 ((change/globalHistory[0])*100||0).toFixed(2)+"%"
-
 }
 
 async function loadPortfolio(){
 try{
-const res = await fetch(API+"/portfolio")
-const data = await res.json()
+const res=await fetch(API+"/portfolio")
+const data=await res.json()
 
-document.getElementById("payout").innerText =
+document.getElementById("payout").innerText=
 "$"+((data.dailyProfit||0)*0.30).toFixed(2)
 
-document.getElementById("totalEarned").innerText =
+document.getElementById("totalEarned").innerText=
 "$"+(data.totalEarned||0).toFixed(2)
 
-document.getElementById("allocatedAmount").innerText =
+document.getElementById("allocatedAmount").innerText=
 "$"+(data.allocated||0).toFixed(2)
 
 }catch(e){}
@@ -412,10 +427,10 @@ document.getElementById("allocatedAmount").innerText =
 
 async function loadTransactions(){
 try{
-const res = await fetch(API+"/transactions")
-const data = await res.json()
+const res=await fetch(API+"/transactions")
+const data=await res.json()
 
-const table = document.getElementById("txTable")
+const table=document.getElementById("txTable")
 table.innerHTML=""
 
 data.forEach(tx=>{
@@ -432,9 +447,8 @@ table.appendChild(row)
 }
 
 async function depositFunds(){
-
-const amount = parseFloat(fundInput.value)
-if(!amount || amount<=0) return alert("Invalid amount")
+const amount=parseFloat(fundInput.value)
+if(!amount||amount<=0) return alert("Invalid amount")
 
 await fetch(API+"/stripe/deposit",{
 method:"POST",
@@ -444,7 +458,6 @@ body:JSON.stringify({amount})
 
 runAI()
 fundInput.value=""
-
 }
 
 async function runAI(){
