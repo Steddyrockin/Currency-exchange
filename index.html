@@ -15,9 +15,7 @@
 --text:#000;
 }
 
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
 margin:0;
@@ -40,6 +38,34 @@ padding-bottom:10px;
 margin-bottom:30px;
 text-align:center;
 }
+
+/* NAV */
+
+.pill-nav{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.pill{
+padding:10px 18px;
+border:1px solid black;
+background:white;
+cursor:pointer;
+font-family:inherit;
+}
+
+.pill.active{
+background:black;
+color:white;
+}
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* UI */
 
 .panel{
 margin-top:30px;
@@ -73,7 +99,6 @@ background:black;
 border:1px solid black;
 color:white;
 margin-top:10px;
-font-family:inherit;
 text-align:center;
 }
 
@@ -85,7 +110,6 @@ background:black;
 color:white;
 border:1px solid black;
 cursor:pointer;
-font-family:inherit;
 }
 
 button:hover{
@@ -107,10 +131,6 @@ font-size:14px;
 text-align:center;
 }
 
-th{
-letter-spacing:1px;
-}
-
 </style>
 </head>
 
@@ -118,23 +138,31 @@ letter-spacing:1px;
 
 <div class="container">
 
+<!-- NAV -->
+<div class="pill-nav">
+<button class="pill active" onclick="switchView('market')">MARKET</button>
+<button class="pill" onclick="switchView('global')">GLOBAL $</button>
+<button class="pill" onclick="switchView('transactions')">TRANSACTIONS</button>
+</div>
+
+<!-- MARKET VIEW -->
+<div id="marketView" class="view active">
+
 <h1>CURRENCY EXCHANGE</h1>
 
-<!-- NEW PLATFORM BLURB -->
+<div class="panel">
+<strong>GLOBAL DOLLAR INDEX</strong>
+<p id="liveGlobal">$0</p>
+</div>
 
 <div class="panel">
-
 <strong>AI MARKET SYSTEM</strong>
-
 <p class="blurb">
 This platform monitors global currency, metals, and energy markets in real time.
 The system continuously evaluates price movements across multiple assets and
 executes automated trading strategies designed to capture market inefficiencies.
-Capital deposited into the system is allocated dynamically across markets while
-risk exposure and profit distribution are managed automatically.
+</p>
 </div>
-
-<!-- ADD FUNDS -->
 
 <div class="panel">
 <strong>ADD FUNDS</strong>
@@ -143,7 +171,6 @@ risk exposure and profit distribution are managed automatically.
 </div>
 
 <table>
-
 <thead>
 <tr>
 <th>ASSET</th>
@@ -152,24 +179,65 @@ risk exposure and profit distribution are managed automatically.
 <th>NET %</th>
 </tr>
 </thead>
-
 <tbody id="tradeTable"></tbody>
-
 </table>
 
 <div class="panel">
-<strong>ALLOCATED (IN CIRCULATION)</strong>
+<strong>ALLOCATED</strong>
 <p id="allocatedAmount">$0</p>
 </div>
 
 <div class="panel">
-<strong>DAILY PAYOUT (30% OF PROFIT)</strong>
+<strong>DAILY PAYOUT</strong>
 <p id="payout">$0</p>
 </div>
 
 <div class="panel">
-<strong>TOTAL AMOUNT EARNED (LIFETIME)</strong>
+<strong>TOTAL EARNED</strong>
 <p id="totalEarned">$0</p>
+</div>
+
+</div>
+
+<!-- GLOBAL VIEW -->
+<div id="globalView" class="view">
+
+<h1>GLOBAL DOLLAR</h1>
+
+<div class="panel">
+<strong>TOTAL MARKET VALUE</strong>
+<p id="globalValue">$0</p>
+</div>
+
+<div class="panel">
+<strong>CHANGE</strong>
+<p id="netFlow">$0</p>
+</div>
+
+<div class="panel">
+<strong>NET %</strong>
+<p id="systemProfit">0%</p>
+</div>
+
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="transactionsView" class="view">
+
+<h1>TRANSACTIONS</h1>
+
+<table>
+<thead>
+<tr>
+<th>TYPE</th>
+<th>AMOUNT</th>
+<th>STATUS</th>
+<th>TIME</th>
+</tr>
+</thead>
+<tbody id="txTable"></tbody>
+</table>
+
 </div>
 
 </div>
@@ -178,21 +246,14 @@ risk exposure and profit distribution are managed automatically.
 
 const API = "http://localhost:4000/api"
 
-let assets = [
-
-"EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",
-"USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW",
-
-"XAUUSD","XAGUSD",
-
-"USOIL","BRENT","WTI","UKOIL",
-"HEATOIL","GASOLINE","DIESEL",
-"NGAS","NATGAS","PROPANE"
-
-]
+let assets = ["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW","XAUUSD","XAGUSD","USOIL","BRENT","WTI","UKOIL","HEATOIL","GASOLINE","DIESEL","NGAS","NATGAS","PROPANE"]
 
 let previous = {}
 let prices = {}
+
+// GLOBAL $
+let globalDollar = 0
+let globalHistory = []
 
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -206,69 +267,64 @@ setInterval(loadPortfolio,60000)
 
 })
 
-function buildTable(){
+function switchView(view){
 
+document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"))
+document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"))
+
+if(view==="market"){
+marketView.classList.add("active")
+document.querySelectorAll(".pill")[0].classList.add("active")
+}
+
+if(view==="global"){
+globalView.classList.add("active")
+document.querySelectorAll(".pill")[1].classList.add("active")
+updateGlobalUI()
+}
+
+if(view==="transactions"){
+transactionsView.classList.add("active")
+document.querySelectorAll(".pill")[2].classList.add("active")
+loadTransactions()
+}
+
+}
+
+function buildTable(){
 const table = document.getElementById("tradeTable")
 
 assets.forEach(asset=>{
-
 const row = document.createElement("tr")
-
 row.innerHTML = `
 <td>${asset}</td>
 <td id="${asset}">--</td>
 <td id="change${asset}">-</td>
-<td id="net${asset}">-</td>
-`
-
+<td id="net${asset}">-</td>`
 table.appendChild(row)
-
 })
-
 }
 
 async function loadMarket(){
-
 try{
-
 const res = await fetch("https://api.exchangerate.host/latest?base=USD")
 const data = await res.json()
 const r = data.rates
 
 prices = {
+EURUSD:1/r.EUR, USDJPY:r.JPY, GBPUSD:1/r.GBP,
+AUDUSD:1/r.AUD, USDCAD:r.CAD, USDCHF:r.CHF,
+EURJPY:r.JPY/r.EUR, EURGBP:r.GBP/r.EUR,
+USDHKD:r.HKD, EURCHF:r.CHF/r.EUR, USDKRW:r.KRW,
 
-EURUSD:1/r.EUR,
-USDJPY:r.JPY,
-GBPUSD:1/r.GBP,
-AUDUSD:1/r.AUD,
-USDCAD:r.CAD,
-USDCHF:r.CHF,
-EURJPY:r.JPY/r.EUR,
-EURGBP:r.GBP/r.EUR,
-USDHKD:r.HKD,
-EURCHF:r.CHF/r.EUR,
-USDKRW:r.KRW,
-
-XAUUSD:2000 + (Math.random()-0.5)*10,
-XAGUSD:25 + (Math.random()-0.5)*0.5,
-
-USOIL:75 + (Math.random()-0.5)*2,
-BRENT:80 + (Math.random()-0.5)*2,
-WTI:76 + (Math.random()-0.5)*2,
-UKOIL:81 + (Math.random()-0.5)*2,
-
-HEATOIL:2.5 + (Math.random()-0.5)*0.1,
-GASOLINE:2.3 + (Math.random()-0.5)*0.1,
-DIESEL:2.7 + (Math.random()-0.5)*0.1,
-
-NGAS:3 + (Math.random()-0.5)*0.1,
-NATGAS:3.1 + (Math.random()-0.5)*0.1,
-PROPANE:1.2 + (Math.random()-0.5)*0.05
-
+XAUUSD:2000+(Math.random()-0.5)*10,
+XAGUSD:25+(Math.random()-0.5)*0.5,
+USOIL:75+(Math.random()-0.5)*2,
+BRENT:80+(Math.random()-0.5)*2,
+WTI:76+(Math.random()-0.5)*2
 }
 
-}catch(e){}
-
+}catch(e){console.error(e)}
 }
 
 function updateMarket(){
@@ -278,60 +334,106 @@ Object.keys(prices).forEach(asset=>{
 const base = prices[asset]
 if(!base) return
 
-const simulated = base + (Math.random()-0.5)*base*0.0005
+const simulated = previous[asset]
+? previous[asset] + (Math.random()-0.5)*base*0.0005
+: base
 
-document.getElementById(asset).innerText =
-simulated.toFixed(4)
+document.getElementById(asset).innerText = simulated.toFixed(4)
 
 if(previous[asset]){
-
 const diff = simulated - previous[asset]
 const percent = (diff/previous[asset])*100
 
-const netCell = document.getElementById("net"+asset)
+document.getElementById("change"+asset).innerText = diff.toFixed(4)
 
-netCell.innerText = percent.toFixed(3)+"%"
-
-if(percent > 0) netCell.style.color="green"
-else if(percent < 0) netCell.style.color="red"
-else netCell.style.color="black"
-
+const net = document.getElementById("net"+asset)
+net.innerText = percent.toFixed(3)+"%"
+net.style.color = percent>0?"green":percent<0?"red":"black"
 }
 
 previous[asset] = simulated
 
 })
 
+// 🔥 GLOBAL CALCULATION
+calculateGlobalDollar()
+
+}
+
+function calculateGlobalDollar(){
+
+const vals = Object.values(prices)
+if(vals.length===0) return
+
+const norm = vals.map(v=>Math.log(v))
+const avg = norm.reduce((a,b)=>a+b,0)/norm.length
+const index = Math.exp(avg)
+
+globalDollar = globalDollar===0 ? index : globalDollar + (index-globalDollar)*0.1
+
+globalHistory.push(globalDollar)
+if(globalHistory.length>100) globalHistory.shift()
+
+updateGlobalUI()
+
+}
+
+function updateGlobalUI(){
+
+document.getElementById("liveGlobal").innerText = "$"+globalDollar.toFixed(2)
+document.getElementById("globalValue").innerText = "$"+globalDollar.toFixed(2)
+
+const change = globalHistory.length>1 ? globalDollar-globalHistory[0] : 0
+
+document.getElementById("netFlow").innerText =
+(change>=0?"+":"")+change.toFixed(2)
+
+document.getElementById("systemProfit").innerText =
+((change/globalHistory[0])*100||0).toFixed(2)+"%"
+
 }
 
 async function loadPortfolio(){
-
 try{
-
 const res = await fetch(API+"/portfolio")
 const data = await res.json()
 
-const dailyProfit = data.dailyProfit || 0
-let payout = dailyProfit > 0 ? dailyProfit * 0.30 : 0
-
 document.getElementById("payout").innerText =
-"$" + payout.toFixed(2)
+"$"+((data.dailyProfit||0)*0.30).toFixed(2)
 
 document.getElementById("totalEarned").innerText =
-"$" + (data.totalEarned || 0).toFixed(2)
+"$"+(data.totalEarned||0).toFixed(2)
 
 document.getElementById("allocatedAmount").innerText =
-"$" + (data.allocated || 0).toFixed(2)
+"$"+(data.allocated||0).toFixed(2)
 
 }catch(e){}
+}
 
+async function loadTransactions(){
+try{
+const res = await fetch(API+"/transactions")
+const data = await res.json()
+
+const table = document.getElementById("txTable")
+table.innerHTML=""
+
+data.forEach(tx=>{
+const row=document.createElement("tr")
+row.innerHTML=`
+<td>${tx.type}</td>
+<td>$${tx.amount.toFixed(2)}</td>
+<td>${tx.status}</td>
+<td>${new Date(tx.time).toLocaleString()}</td>`
+table.appendChild(row)
+})
+
+}catch(e){}
 }
 
 async function depositFunds(){
 
-const input = document.getElementById("fundInput")
-const amount = parseFloat(input.value)
-
+const amount = parseFloat(fundInput.value)
 if(!amount || amount<=0) return alert("Invalid amount")
 
 await fetch(API+"/stripe/deposit",{
@@ -341,7 +443,7 @@ body:JSON.stringify({amount})
 })
 
 runAI()
-input.value=""
+fundInput.value=""
 
 }
 
