@@ -12,6 +12,7 @@
 <style>
 :root{--bg:#d4d4d4;--text:#000;}
 *{box-sizing:border-box;}
+
 body{
 margin:0;
 padding:40px;
@@ -19,7 +20,9 @@ background:var(--bg);
 color:var(--text);
 font-family:"JetBrains Mono",monospace;
 }
+
 .container{max-width:1000px;margin:auto;}
+
 h1{
 font-size:28px;
 letter-spacing:2px;
@@ -38,8 +41,18 @@ margin-bottom:30px;
 flex-wrap:wrap;
 font-size:14px;
 }
-.nav-link{color:black;text-decoration:none;opacity:.6;}
-.nav-link.active{opacity:1;font-weight:bold;border-bottom:1px solid black;}
+
+.nav-link{
+color:black;
+text-decoration:none;
+opacity:.6;
+}
+
+.nav-link.active{
+opacity:1;
+font-weight:bold;
+border-bottom:1px solid black;
+}
 
 /* UI */
 .panel{
@@ -48,21 +61,36 @@ border:1px solid black;
 padding:25px;
 text-align:center;
 }
+
 input,button{
 width:100%;
 padding:12px;
 margin-top:10px;
 border:1px solid black;
 }
-input{background:black;color:white;}
-button{background:black;color:white;cursor:pointer;}
-button:hover{background:white;color:black;}
+
+input{
+background:black;
+color:white;
+}
+
+button{
+background:black;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:white;
+color:black;
+}
 
 table{
 width:100%;
 margin-top:30px;
 border-collapse:collapse;
 }
+
 th,td{
 padding:14px;
 border-bottom:1px solid black;
@@ -72,10 +100,20 @@ text-align:center;
 .view{display:none;}
 .view.active{display:block;}
 
+/* FOOTER */
 .footer{
 margin-top:50px;
 text-align:center;
 font-size:12px;
+}
+
+.footer a{
+color:black;
+text-decoration:none;
+}
+
+.footer a:hover{
+text-decoration:underline;
 }
 </style>
 </head>
@@ -94,7 +132,7 @@ font-size:12px;
 <h1>CURRENCY EXCHANGE</h1>
 
 <div class="panel">
-<strong>GLOBAL VALUE</strong>
+<strong>GLOBAL DOLLAR</strong>
 <p id="liveGlobal">$0</p>
 </div>
 
@@ -121,7 +159,6 @@ font-size:12px;
 <div id="transactionsView" class="view">
 <h1>TRANSACTIONS</h1>
 
-<!-- SEND TO BANK -->
 <div class="panel">
 <strong>SEND TO BANK</strong>
 <input type="number" id="transferAmount" placeholder="Amount"/>
@@ -138,6 +175,7 @@ font-size:12px;
 </table>
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
 © 2026 Clean, Inc. | <a href="mailto:steddyrockin@gmail.com">Contact</a>
 </div>
@@ -187,14 +225,14 @@ liveGlobal.innerText="$"+globalValue
 async function depositFunds(){
 const amt=parseFloat(fundInput.value)
 if(!amt) return alert("Invalid")
-await fetch(API+"/deposit",{method:"POST",body:JSON.stringify({amount:amt})})
+await fetch(API+"/deposit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})})
 fundInput.value=""
 }
 
 async function sendToBank(){
 const amount=parseFloat(transferAmount.value)
-const accountNumber=accountNumberInput()
-const routingNumber=routingNumberInput()
+const accountNumber=document.getElementById("accountNumber").value
+const routingNumber=document.getElementById("routingNumber").value
 
 if(!amount||!accountNumber||!routingNumber) return alert("Missing info")
 
@@ -207,9 +245,6 @@ body:JSON.stringify({amount,accountNumber,routingNumber})
 alert("Transfer sent")
 loadTransactions()
 }
-
-function accountNumberInput(){return document.getElementById("accountNumber").value}
-function routingNumberInput(){return document.getElementById("routingNumber").value}
 
 async function loadTransactions(){
 const data=await fetch(API+"/transactions").then(r=>r.json()).catch(()=>[])
