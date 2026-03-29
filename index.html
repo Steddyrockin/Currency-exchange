@@ -1,264 +1,306 @@
+Change allocated to balance.
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Currency Exchange</title>
-
-<!-- 🌍 FAVICON -->
-<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/44/44386.png"/>
-
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 <script src="https://js.stripe.com/v3/"></script>
 
 <style>
-:root{--bg:#d4d4d4;--text:#000;}
-body{margin:0;padding:40px;background:var(--bg);font-family:"JetBrains Mono",monospace;}
+:root{
+  --bg:#d4d4d4;
+  --text:#000;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:40px;background:var(--bg);color:var(--text);font-family:"JetBrains Mono",monospace;}
 .container{max-width:1000px;margin:auto;}
+h1{font-size:28px;letter-spacing:2px;border-bottom:1px solid black;padding-bottom:10px;margin-bottom:30px;text-align:center;}
 
-h1{text-align:center;border-bottom:1px solid black;padding-bottom:10px;}
+/* NAV LINKS */
+.nav-links{display:flex;justify-content:center;gap:20px;margin-bottom:30px;flex-wrap:wrap;font-size:14px;letter-spacing:1px;}
+.nav-link{text-decoration:none;color:black;padding-bottom:4px;border-bottom:1px solid transparent;opacity:0.6;}
+.nav-link:hover{border-bottom:1px solid black;opacity:1;}
+.nav-link.active{border-bottom:1px solid black;font-weight:bold;opacity:1;}
 
-.nav-links{display:flex;justify-content:center;gap:20px;margin-bottom:30px;}
-.nav-link{opacity:.6;text-decoration:none;color:black;}
-.nav-link.active{opacity:1;border-bottom:1px solid black;}
+/* UI PANELS */
+.panel{margin-top:30px;border:1px solid black;padding:25px;text-align:center;}
+.panel strong{display:block;margin-bottom:12px;letter-spacing:1px;}
+.panel p{margin:0;font-size:18px;}
+.blurb{font-size:14px;line-height:1.6;max-width:700px;margin:auto;}
+input{width:100%;padding:12px;background:black;border:1px solid black;color:white;margin-top:10px;text-align:center;}
+button{width:100%;margin-top:12px;padding:12px;background:black;color:white;border:1px solid black;cursor:pointer;}
+button:hover{background:white;color:black;}
+.apple-pay-btn{margin-top:10px;padding:14px;background:black;color:white;border:1px solid black;cursor:pointer;}
+.apple-pay-btn:hover{background:white;color:black;}
+table{width:100%;margin-top:30px;border-collapse:collapse;table-layout:fixed;}
+th,td{padding:14px;border-bottom:1px solid black;font-size:14px;text-align:center;}
+.view{display:none;}
+.view.active{display:block;}
 
-.panel{margin-top:20px;border:1px solid black;padding:20px;text-align:center;}
+/* FOOTER */
+.footer{margin-top:50px;padding-top:20px;border-top:1px solid black;display:flex;justify-content:center;gap:10px;font-size:12px;letter-spacing:1px;}
+.footer a{color:black;text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+.divider{opacity:0.5;}
 
-input,select,button{
-  width:100%;padding:12px;margin-top:10px;
-  background:black;color:white;border:1px solid black;
+/* MODAL */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:1000;}
+.modal-content{background:#d4d4d4;padding:30px;border:1px solid black;width:100%;max-width:400px;text-align:center;}
+.modal h2{margin-bottom:15px;letter-spacing:1px;}
+.modal-copy{font-size:13px;margin-bottom:20px;line-height:1.5;}
+.modal select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:1px solid black;
+  background:black;
+  color:white;
+  appearance:none;
+  cursor:pointer;
+  text-align:center;
 }
-
-/* dropdown arrow */
-.select-wrap{position:relative;}
-.select-wrap:after{
-  content:"▼";
-  position:absolute;right:12px;top:50%;
-  transform:translateY(-50%);
-  color:white;font-size:12px;
-}
-
-table{width:100%;margin-top:20px;border-collapse:collapse;}
-th,td{padding:12px;border-bottom:1px solid black;text-align:center;}
-
-.modal{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.6);
-  display:none;justify-content:center;align-items:center;
-}
-.modal-content{background:#d4d4d4;padding:25px;width:350px;border:1px solid black;}
-
-.footer{text-align:center;margin-top:40px;font-size:12px;}
+.modal select option{background:black;color:white;}
+.modal select:focus{outline:none;background:white;color:black;}
+.modal .secondary{background:white;color:black;cursor:pointer;margin-top:10px;padding:10px;border:1px solid black;}
+.modal .secondary:hover{background:black;color:white;}
 </style>
 </head>
-
 <body>
+
 <div class="container">
 
+<!-- NAV -->
 <div class="nav-links">
-<a href="#" class="nav-link active" onclick="switchView('market',this)">MARKET</a>
-<a href="#" class="nav-link" onclick="switchView('transactions',this)">TRANSACTIONS</a>
+  <a href="#" class="nav-link active" onclick="switchView('market', this)">MARKET</a>
+  <a href="#" class="nav-link" onclick="switchView('global', this)">GLOBAL</a>
+  <a href="#" class="nav-link" onclick="switchView('transactions', this)">TRANSACTIONS</a>
 </div>
 
 <!-- MARKET -->
-<div id="marketView">
-<h1>CURRENCY EXCHANGE</h1>
+<div id="marketView" class="view active">
+  <h1>CURRENCY EXCHANGE</h1>
 
-<div class="panel">
-<strong>BALANCE</strong>
-<p id="balance">$0</p>
+  <div class="panel">
+    <strong>GLOBAL DOLLAR</strong>
+    <p id="liveGlobal">$0</p>
+  </div>
+
+  <div class="panel">
+    <strong>AI MARKET SYSTEM</strong>
+    <p class="blurb">
+      Currency Exchange monitors global markets in real time, analyzes price patterns, and automatically executes trades.
+    </p>
+  </div>
+
+  <div class="panel">
+    <strong>ADD FUNDS</strong>
+    <button onclick="openDepositModal()">DEPOSIT FUNDS</button>
+    <button id="applePayBtn" class="apple-pay-btn" style="display:none;"> Pay</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>ASSET</th><th>VALUE</th><th>CHANGE</th><th>NET %</th></tr>
+    </thead>
+    <tbody id="tradeTable"></tbody>
+  </table>
+
+  <div class="panel"><strong>ALLOCATED</strong><p id="allocatedAmount">$0</p></div>
+  <div class="panel"><strong>DAILY PAYOUT</strong><p id="payout">$0</p></div>
+  <div class="panel"><strong>TOTAL EARNED</strong><p id="totalEarned">$0</p></div>
 </div>
 
-<div class="panel">
-<strong>DAILY PAYOUT</strong>
-<input type="number" id="payoutPercent" placeholder="%"/>
-<input type="number" id="payoutFixed" placeholder="Fixed"/>
-<button onclick="updatePayout()">UPDATE</button>
-<p id="payout">$0</p>
-</div>
-
-<div class="panel">
-<strong>TOTAL EARNED</strong>
-<p id="totalEarned">$0</p>
-</div>
-
-<div class="panel">
-<button onclick="openDepositModal()">DEPOSIT FUNDS</button>
-</div>
-
+<!-- GLOBAL -->
+<div id="globalView" class="view">
+  <h1>GLOBAL DOLLAR</h1>
+  <div class="panel"><strong>TOTAL MARKET VALUE</strong><p id="globalValue">$0</p></div>
+  <div class="panel"><strong>CHANGE</strong><p id="netFlow">$0</p></div>
+  <div class="panel"><strong>NET %</strong><p id="systemProfit">0%</p></div>
 </div>
 
 <!-- TRANSACTIONS -->
-<div id="transactionsView" style="display:none;">
-<h1>LEDGER</h1>
-
-<div class="panel">
-<input type="number" id="sendAmount" placeholder="Send amount"/>
-<button onclick="sendFiat()">SEND</button>
+<div id="transactionsView" class="view">
+  <h1>TRANSACTIONS</h1>
+  <table>
+    <thead>
+      <tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>
+    </thead>
+    <tbody id="txTable"></tbody>
+  </table>
 </div>
 
-<table>
-<thead>
-<tr>
-<th>DATE</th>
-<th>TYPE</th>
-<th>AMOUNT</th>
-<th>BALANCE</th>
-<th>STATUS</th>
-</tr>
-</thead>
-<tbody id="txTable"></tbody>
-</table>
+<!-- ADD FUNDS MODAL -->
+<div id="depositModal" class="modal">
+  <div class="modal-content">
+    <h2>Deposit Funds</h2>
+    <p class="modal-copy">
+      Please select the currency and enter the amount you wish to deposit. All deposits are processed securely and professionally.
+    </p>
+    <select id="currencySelect">
+      <option value="USD">USD – US Dollar</option>
+      <option value="EUR">EUR – Euro</option>
+      <option value="GBP">GBP – British Pound</option>
+      <option value="JPY">JPY – Japanese Yen</option>
+      <option value="AUD">AUD – Australian Dollar</option>
+      <option value="CAD">CAD – Canadian Dollar</option>
+      <option value="CHF">CHF – Swiss Franc</option>
+    </select>
+    <input type="number" id="fundInput" placeholder="Enter amount"/>
+    <button onclick="depositFunds()">Submit</button>
+    <button class="secondary" onclick="closeDepositModal()">Cancel</button>
+  </div>
 </div>
 
-<!-- MODAL -->
-<div id="depositModal" class="modal" onclick="outsideClose(event)">
-<div class="modal-content">
-
-<h3>Deposit Funds</h3>
-
-<div class="select-wrap">
-<select id="currencySelect">
-<option value="USD">$ USD</option>
-<option value="EUR">€ EUR</option>
-<option value="GBP">£ GBP</option>
-<option value="JPY">¥ JPY</option>
-</select>
-</div>
-
-<input type="number" id="fundInput" placeholder="Enter amount"/>
-
-<button onclick="depositFunds()">Confirm</button>
-
-</div>
-</div>
-
+<!-- FOOTER -->
 <div class="footer">
-© <span id="year"></span> Clean, Inc.
+  <span>© <span id="currentYear"></span> Clean, Inc.</span>
+  <span class="divider">|</span>
+  <a href="mailto:steddyrockin@gmail.com">Contact</a>
 </div>
 
 </div>
 
 <script>
-const API="http://localhost:4000/api";
-let balance=0,totalEarned=0,transactions=[];
-let payoutPercent=0,payoutFixed=0;
+const API = "http://localhost:4000/api";
+const stripe = Stripe("pk_test_YOUR_PUBLIC_KEY");
 
-const symbols={USD:"$",EUR:"€",GBP:"£",JPY:"¥"};
+let assets = ["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","USDCHF","EURJPY","EURGBP","USDHKD","EURCHF","USDKRW","XAUUSD"];
+let previous = {};
+let prices = {};
+let globalDollar = 0;
+let globalHistory = [];
 
-document.getElementById("year").innerText=new Date().getFullYear();
+document.addEventListener("DOMContentLoaded", ()=>{
+  buildTable();
+  loadMarket();
+  loadPortfolio();
+  setupApplePay();
+  setInterval(loadMarket,10000);
+  setInterval(updateMarket,1000);
+  setInterval(loadPortfolio,60000);
+  document.getElementById("currentYear").innerText = new Date().getFullYear();
+});
 
-/* NAV */
-function switchView(v,el){
-event.preventDefault();
-marketView.style.display=v==="market"?"block":"none";
-transactionsView.style.display=v==="transactions"?"block":"none";
-document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
-el.classList.add("active");
+function switchView(view, el){
+  event.preventDefault();
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
+  if(view==="market") marketView.classList.add("active");
+  if(view==="global"){globalView.classList.add("active");updateGlobalUI()}
+  if(view==="transactions"){transactionsView.classList.add("active");loadTransactions()}
+  el.classList.add("active");
 }
 
-/* MODAL */
-function openDepositModal(){depositModal.style.display="flex";}
-function outsideClose(e){if(e.target.id==="depositModal") closeDepositModal();}
-function closeDepositModal(){depositModal.style.display="none";}
+function buildTable(){
+  const table=tradeTable;
+  assets.forEach(a=>{
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="change${a}">-</td><td id="net${a}">-</td>`;
+    table.appendChild(row);
+  });
+}
+
+async function loadMarket(){
+  const res=await fetch("https://api.exchangerate.host/latest?base=USD");
+  const r=(await res.json()).rates;
+  prices={
+    EURUSD:1/r.EUR,USDJPY:r.JPY,GBPUSD:1/r.GBP,
+    AUDUSD:1/r.AUD,USDCAD:r.CAD,USDCHF:r.CHF,
+    EURJPY:r.JPY/r.EUR,EURGBP:r.GBP/r.EUR,
+    USDHKD:r.HKD,EURCHF:r.CHF/r.EUR,USDKRW:r.KRW,
+    XAUUSD:2000+(Math.random()-0.5)*10
+  };
+}
+
+function updateMarket(){
+  Object.keys(prices).forEach(a=>{
+    const base=prices[a];
+    const sim=previous[a]?previous[a]+(Math.random()-0.5)*base*0.0005:base;
+    document.getElementById(a).innerText=sim.toFixed(4);
+    if(previous[a]){
+      const diff=sim-previous[a];
+      const pct=(diff/previous[a])*100;
+      document.getElementById("change"+a).innerText=diff.toFixed(4);
+      const net=document.getElementById("net"+a);
+      net.innerText=pct.toFixed(3)+"%";
+      net.style.color=pct>0?"green":pct<0?"red":"black";
+    }
+    previous[a]=sim;
+  });
+  calculateGlobalDollar();
+}
+
+function calculateGlobalDollar(){
+  const vals=Object.values(prices);
+  const avg=Math.exp(vals.map(v=>Math.log(v)).reduce((a,b)=>a+b,0)/vals.length);
+  globalDollar=globalDollar===0?avg:globalDollar+(avg-globalDollar)*0.1;
+  globalHistory.push(globalDollar);
+  if(globalHistory.length>100) globalHistory.shift();
+  updateGlobalUI();
+}
+
+function updateGlobalUI(){
+  liveGlobal.innerText="$"+globalDollar.toFixed(2);
+  globalValue.innerText="$"+globalDollar.toFixed(2);
+  const change=globalHistory.length>1?globalDollar-globalHistory[0]:0;
+  netFlow.innerText=(change>=0?"+":"")+change.toFixed(2);
+  systemProfit.innerText=((change/globalHistory[0])*100||0).toFixed(2)+"%";
+}
+
+/* MODAL FUNCTIONS */
+function openDepositModal(){document.getElementById('depositModal').style.display='flex';}
+function closeDepositModal(){document.getElementById('depositModal').style.display='none';}
 
 /* DEPOSIT */
 async function depositFunds(){
-let amt=parseFloat(fundInput.value);
-let cur=currencySelect.value;
-
-if(!amt||amt<=0) return alert("Invalid amount");
-
-try{
-await fetch(API+"/stripe/deposit",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({amount:amt,currency:cur})
-});
-
-balance+=amt;
-
-addTx("DEPOSIT",amt,"success");
-
-}catch(e){
-addTx("DEPOSIT",amt,"failed");
-alert("Deposit failed");
+  const amt=parseFloat(fundInput.value);
+  const currency = currencySelect.value;
+  if(!amt||amt<=0) return alert("Invalid amount");
+  await fetch(API+"/stripe/deposit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt,currency})});
+  runAI();
+  fundInput.value="";
+  closeDepositModal();
 }
 
-updateUI();
-closeDepositModal();
+/* APPLE PAY */
+async function setupApplePay(){
+  const pr=stripe.paymentRequest({country:'US',currency:'usd',total:{label:'Deposit',amount:1000}});
+  const result=await pr.canMakePayment();
+  if(result){
+    applePayBtn.style.display="block";
+    applePayBtn.onclick=()=>{
+      const amt=parseFloat(fundInput.value)||10;
+      pr.update({total:{label:'Deposit',amount:Math.round(amt*100)}});
+      pr.show();
+    }
+    pr.on('paymentmethod',async ev=>{
+      const amt=parseFloat(fundInput.value)||10;
+      const res=await fetch(API+"/stripe/apple-pay",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
+      const {clientSecret}=await res.json();
+      const {error}=await stripe.confirmCardPayment(clientSecret,{payment_method:ev.paymentMethod.id},{handleActions:false});
+      if(error) ev.complete('fail'); else{ev.complete('success');runAI();}
+    });
+  }
 }
 
-/* SEND */
-function sendFiat(){
-let amt=parseFloat(sendAmount.value);
-
-if(!amt||amt<=0) return alert("Invalid amount");
-
-if(amt>balance){
-addTx("SEND",amt,"failed");
-return alert("Insufficient balance");
+async function runAI(){await fetch(API+"/ai/run",{method:"POST"});}
+async function loadPortfolio(){
+  const data=await (await fetch(API+"/portfolio")).json();
+  payout.innerText="$"+((data.dailyProfit||0)*0.30).toFixed(2);
+  totalEarned.innerText="$"+(data.totalEarned||0).toFixed(2);
+  allocatedAmount.innerText="$"+(data.allocated||0).toFixed(2);
 }
-
-balance-=amt;
-addTx("SEND",-amt,"success");
-
-updateUI();
-}
-
-/* PAYOUT */
-function updatePayout(){
-payoutPercent=parseFloat(document.getElementById("payoutPercent").value)||0;
-payoutFixed=parseFloat(document.getElementById("payoutFixed").value)||0;
-
-let payout=(balance*(payoutPercent/100))+payoutFixed;
-
-if(payout>balance){
-return alert("Payout exceeds balance");
-}
-
-balance-=payout;
-totalEarned+=payout;
-
-addTx("PAYOUT",-payout,"success");
-
-updateUI();
-}
-
-/* TX */
-function addTx(type,amt,status){
-transactions.unshift({
-type,
-amount:amt,
-status,
-balance,
-time:new Date()
-});
-renderTx();
-}
-
-function renderTx(){
-txTable.innerHTML="";
-transactions.forEach(t=>{
-let row=document.createElement("tr");
-row.innerHTML=`
-<td>${t.time.toLocaleString()}</td>
-<td>${t.type}</td>
-<td>${t.amount.toFixed(2)}</td>
-<td>${t.balance.toFixed(2)}</td>
-<td>${t.status}</td>`;
-txTable.appendChild(row);
-});
-}
-
-/* UI */
-function updateUI(){
-balanceEl.innerText="$"+balance.toFixed(2);
-totalEarned.innerText="$"+totalEarned.toFixed(2);
-let payoutCalc=(balance*(payoutPercent/100))+payoutFixed;
-payout.innerText="$"+payoutCalc.toFixed(2);
+async function loadTransactions(){
+  const data=await (await fetch(API+"/transactions")).json();
+  txTable.innerHTML="";
+  data.forEach(tx=>{
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${tx.type}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
+    txTable.appendChild(row);
+  });
 }
 </script>
-
 </body>
 </html>
