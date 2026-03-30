@@ -18,24 +18,22 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      scroll-behavior: smooth;
     }
 
     body {
       font-family: 'JetBrains Mono', monospace;
       background: var(--bg);
       color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
     }
 
-    .container {
-      flex: 1;
+    section {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px;
+      padding: 40px 20px;
     }
 
     .content {
@@ -44,15 +42,21 @@
 
     h1 {
       font-size: 2.5rem;
-      font-weight: 600;
-      letter-spacing: 2px;
       margin-bottom: 20px;
     }
 
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     p {
-      line-height: 1.6;
-      font-size: 1rem;
-      margin-bottom: 30px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 15px;
     }
 
     .links {
@@ -60,6 +64,7 @@
       flex-direction: column;
       gap: 15px;
       align-items: center;
+      margin-top: 30px;
     }
 
     a.link {
@@ -92,12 +97,19 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    .divider {
+      border-top: 1px solid #000;
+      width: 100%;
+      margin: 40px 0;
+    }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+  <!-- MAIN -->
+  <section>
     <div class="content">
       <h1>Clean, Inc.</h1>
 
@@ -108,22 +120,82 @@
       </p>
 
       <div class="links">
-        <a class="link" href="#" target="_blank">Aura</a>
-        <a class="link" href="#" target="_blank">Surf Live</a>
-
+        <a class="link" href="#">Aura</a>
+        <a class="link" href="#">Surf Live</a>
         <a class="link" href="https://steddyrockin.github.io/Currency-exchange/" target="_blank">
           Currency Exchange
         </a>
+        <a class="link" href="#legalize">Legalize</a>
       </div>
     </div>
-  </div>
+  </section>
 
-  <footer>
-    <div>
-      Clean, Inc. |
-      <a href="#">Legalize</a> |
-      <a href="mailto:Steddyrockin@gmail.com">Contact</a>
+  <!-- LEGALIZE -->
+  <section id="legalize">
+    <div class="content">
+      <h1>Legalize</h1>
+
+      <p>
+        This document defines the operational, legal, and philosophical framework of Clean, Inc. 
+        By accessing or interacting with any system, product, or service associated with Clean, Inc., 
+        you agree to the following principles and conditions.
+      </p>
+
+      <div class="divider"></div>
+
+      <h2>System Integrity</h2>
+      <p>
+        Clean, Inc. operates as an interconnected system. Each component is designed to function 
+        independently while contributing to the coherence of the whole. Users agree not to disrupt, 
+        exploit, or manipulate system behavior beyond intended use.
+      </p>
+
+      <h2>Autonomy & Use</h2>
+      <p>
+        All users maintain full autonomy over their actions. Clean, Inc. provides tools, not directives. 
+        Responsibility for interpretation, decision-making, and outcomes remains with the user.
+      </p>
+
+      <h2>Financial Interfaces</h2>
+      <p>
+        Products such as Currency Exchange are provided “as is.” Clean, Inc. does not guarantee accuracy, 
+        availability, or financial outcomes. Users are responsible for verifying all financial data before execution.
+      </p>
+
+      <h2>Privacy</h2>
+      <p>
+        Clean, Inc. does not intentionally collect, store, or sell personal data beyond what is required 
+        for system functionality. Third-party services may operate under separate policies.
+      </p>
+
+      <h2>Intellectual Structure</h2>
+      <p>
+        The Clean Philosophy and associated systems are the intellectual property of Clean, Inc. 
+        Unauthorized use or reproduction is prohibited.
+      </p>
+
+      <h2>Limitation of Liability</h2>
+      <p>
+        Clean, Inc. shall not be held liable for any damages arising from the use or inability to use its systems.
+      </p>
+
+      <h2>Evolution of System</h2>
+      <p>
+        Clean, Inc. reserves the right to modify its system at any time. Continued use constitutes acceptance of changes.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        <a href="mailto:Steddyrockin@gmail.com">Steddyrockin@gmail.com</a>
+      </p>
     </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    Clean, Inc. |
+    <a href="#legalize">Legalize</a> |
+    <a href="mailto:Steddyrockin@gmail.com">Contact</a>
   </footer>
 
 </body>
