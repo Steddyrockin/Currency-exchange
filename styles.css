@@ -5,6 +5,12 @@ body {
     font-family: "JetBrains Mono", "Roboto Mono", "SF Mono", monospace;
 }
 
+/* Ensure dropdown text is centered in modals */
+.modal select {
+  text-align: center;       /* Centers selected text */
+  text-align-last: center;  /* Ensures centering works in Firefox */
+}
+
 .dropdown-wrapper {
   display: flex;
   justify-content: center;   /* horizontal center */
