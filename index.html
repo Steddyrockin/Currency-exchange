@@ -138,7 +138,7 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
 <button onclick="openWithdrawModal()">Send</button>
-<button id="applePayBtn" class="apple-pay-btn" style="display:none;"> Pay</button>
+<button id="applePayBtn" class="apple-pay-btn">Pay with  Apple Pay</button>
 </div>
 
 <!-- DEPOSIT MODAL -->
@@ -261,6 +261,55 @@ row.innerHTML=`
 txTable.appendChild(row);
 });
 }
+
+/* APPLE PAY SETUP */
+async function setupApplePay() {
+  const pr = stripe.paymentRequest({
+    country: 'US',
+    currency: 'usd',
+    total: { label: 'Deposit', amount: 1000 },
+    requestPayerName: true,
+    requestPayerEmail: true
+  });
+
+  const result = await pr.canMakePayment();
+  const applePayBtn = document.getElementById("applePayBtn");
+
+  if (result && result.applePay) {
+    applePayBtn.style.display = "block";
+
+    applePayBtn.onclick = () => {
+      const amt = parseFloat(document.getElementById("fundInput").value) || 10;
+      pr.update({ total: { label: 'Deposit', amount: Math.round(amt * 100) } });
+      pr.show();
+    };
+
+    pr.on('paymentmethod', async ev => {
+      const amt = parseFloat(document.getElementById("fundInput").value) || 10;
+      const res = await fetch(API + "/stripe/apple-pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: amt })
+      });
+
+      const { clientSecret } = await res.json();
+      const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: ev.paymentMethod.id }, { handleActions: false });
+
+      if (error) ev.complete('fail');
+      else {
+        ev.complete('success');
+        alert("Apple Pay deposit successful!");
+        loadTransactions();
+      }
+    });
+  } else {
+    applePayBtn.style.display = "none";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setupApplePay();
+});
 </script>
 
 </body>
