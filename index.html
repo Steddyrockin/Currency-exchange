@@ -83,6 +83,32 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 .secondary:hover{
   background:black;color:white;
 }
+
+/* UPDATED DEPOSIT DROPDOWN */
+.modal select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid black;
+  background: black;
+  color: white;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  position: relative;
+}
+.modal select option {
+  background: black;
+  color: white;
+}
+.modal select:focus {
+  outline: none;
+  background: #111;
+  color: #fff;
+}
 </style>
 </head>
 
@@ -143,28 +169,33 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 
 <!-- DEPOSIT MODAL -->
 <div id="depositModal" class="modal">
-<div class="modal-content">
-<h2>Deposit</h2>
-<select id="currencySelect">
-<option value="USD">USD</option>
-<option value="EUR">EUR</option>
-</select>
-<input type="number" id="fundInput" placeholder="Amount"/>
-<button onclick="depositFunds()">Submit</button>
-<button class="secondary" onclick="closeDepositModal()">Cancel</button>
-</div>
+  <div class="modal-content">
+    <h2>Deposit</h2>
+    <select id="currencySelect">
+      <option value="USD">USD – US Dollar</option>
+      <option value="EUR">EUR – Euro</option>
+      <option value="GBP">GBP – British Pound</option>
+      <option value="JPY">JPY – Japanese Yen</option>
+      <option value="AUD">AUD – Australian Dollar</option>
+      <option value="CAD">CAD – Canadian Dollar</option>
+      <option value="CHF">CHF – Swiss Franc</option>
+    </select>
+    <input type="number" id="fundInput" placeholder="Amount"/>
+    <button onclick="depositFunds()">Submit</button>
+    <button class="secondary" onclick="closeDepositModal()">Cancel</button>
+  </div>
 </div>
 
 <!-- WITHDRAW MODAL -->
 <div id="withdrawModal" class="modal">
-<div class="modal-content">
-<h2>Send</h2>
-<input id="routingNumber" placeholder="Routing Number"/>
-<input id="accountNumber" placeholder="Account Number"/>
-<input id="withdrawAmount" type="number" placeholder="Amount"/>
-<button onclick="sendToBank()">Submit Transfer</button>
-<button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
-</div>
+  <div class="modal-content">
+    <h2>Send</h2>
+    <input id="routingNumber" placeholder="Routing Number"/>
+    <input id="accountNumber" placeholder="Account Number"/>
+    <input id="withdrawAmount" type="number" placeholder="Amount"/>
+    <button onclick="sendToBank()">Submit Transfer</button>
+    <button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
+  </div>
 </div>
 
 <!-- FOOTER -->
@@ -227,7 +258,6 @@ async function sendToBank(){
 const routing=routingNumber.value.trim();
 const account=accountNumber.value.trim();
 const amount=parseFloat(withdrawAmount.value);
-
 if(!routing||!account)return alert("Enter banking details");
 if(!amount)return alert("Invalid amount");
 
