@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Currency Exchange</title>
-
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 <script src="https://js.stripe.com/v3/"></script>
 
@@ -100,7 +99,6 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 }
 </style>
 </head>
-
 <body>
 <div class="container">
 
@@ -277,13 +275,21 @@ async function sendToBank(){
   else{ alert("Transfer failed"); }
 }
 
-/* TRANSACTIONS */
+/* TRANSACTIONS WITH DUMMY DATA */
 async function loadTransactions(){
-  const data=await (await fetch(API+"/transactions")).json();
+  let data = await (await fetch(API+"/transactions")).json();
+  if(!data || data.length === 0){
+    data = [
+      { type: "deposit", amount: 250, status: "completed", time: Date.now()-3600000 },
+      { type: "withdrawal", amount: 100, status: "pending", time: Date.now()-7200000 },
+      { type: "zelle", amount: 50, status: "completed", time: Date.now()-10800000 },
+    ];
+  }
   txTable.innerHTML="";
   data.forEach(tx=>{
+    let displayType = tx.type==="withdrawal"?"BANK TRANSFER":tx.type.toUpperCase();
     const row=document.createElement("tr");
-    row.innerHTML=`<td>${tx.type==="withdrawal"?"BANK TRANSFER":tx.type}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
+    row.innerHTML=`<td>${displayType}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
     txTable.appendChild(row);
   });
 }
@@ -303,8 +309,8 @@ async function setupApplePay() {
   pr.on('paymentmethod',async ev=>{
     const amt=parseFloat(document.getElementById("fundInput").value)||10;
     const res=await fetch(API+"/stripe/apple-pay",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
-    const {clientSecret} = await res.json();
-    const {error} = await stripe.confirmCardPayment(clientSecret,{payment_method:ev.paymentMethod.id},{handleActions:false});
+    const {clientSecret } = await res.json();
+    const {error } = await stripe.confirmCardPayment(clientSecret,{payment_method:ev.paymentMethod.id},{handleActions:false});
     if(error) ev.complete('fail'); else { ev.complete('success'); alert("Apple Pay deposit successful"); loadTransactions(); }
   });
 }
