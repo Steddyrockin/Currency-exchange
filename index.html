@@ -71,7 +71,7 @@ h1{
   margin:auto;
 }
 
-/* INPUTS */
+/* GLOBAL INPUTS (non-modal stay dark) */
 input, select{
   width:100%;
   padding:12px;
@@ -84,12 +84,91 @@ input, select{
   color:white;
 }
 
-/* Dropdown arrow */
+/* MODAL BASE */
+.modal{
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+/* MODAL CONTAINER */
+.modal-content{
+  background:#d4d4d4;
+  padding:30px;
+  border:1px solid black;
+  max-width:400px;
+  width:100%;
+  text-align:center;
+
+  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing:0.3px;
+}
+
+/* MODAL TYPOGRAPHY */
+.modal-content h2{
+  font-size:20px;
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+/* 🔥 PREMIUM MODAL INPUTS */
+.modal-content input,
+.modal-content select{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+
+  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size:14px;
+  font-weight:500;
+
+  background:white;
+  color:black;
+  border:1px solid #ccc;
+  border-radius:6px;
+
+  text-align:left;
+
+  transition:all 0.2s ease;
+}
+
+/* Keep numbers monospaced */
+.modal-content input[type="number"]{
+  font-family:"JetBrains Mono", monospace;
+  letter-spacing:0.5px;
+}
+
+/* Focus state */
+.modal-content input:focus,
+.modal-content select:focus{
+  outline:none;
+  border:1px solid black;
+  box-shadow:0 0 0 2px rgba(0,0,0,0.08);
+}
+
+/* Placeholder */
+.modal-content input::placeholder{
+  color:#888;
+  font-weight:400;
+}
+
+/* Field spacing */
+.modal-content input + input,
+.modal-content input + select,
+.modal-content select + input{
+  margin-top:14px;
+}
+
+/* Custom dropdown arrow */
 .modal select{
   appearance:none;
   -webkit-appearance:none;
   -moz-appearance:none;
-  background-image:url('data:image/svg+xml;utf8,<svg fill="white" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-image:url('data:image/svg+xml;utf8,<svg fill="black" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
   background-repeat:no-repeat;
   background-position:right 12px center;
   background-size:12px;
@@ -106,8 +185,19 @@ button{
   color:white;
   border:1px solid black;
   cursor:pointer;
+
+  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight:500;
 }
 button:hover{background:white;color:black;}
+
+.secondary{
+  background:white;color:black;
+}
+.secondary:hover{
+  background:black;color:white;
+}
+
 .apple-pay-btn{margin-top:10px;padding:14px;}
 
 /* TABLE */
@@ -133,63 +223,9 @@ th,td{
   gap:10px;
   font-size:12px;
 }
-
-/* MODAL BASE */
-.modal{
-  position:fixed;
-  top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-
-/* ✅ MODAL FONT UPGRADE */
-.modal-content{
-  background:#d4d4d4;
-  padding:30px;
-  border:1px solid black;
-  max-width:400px;
-  width:100%;
-  text-align:center;
-
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing:0.3px;
-}
-
-.modal-content h2{
-  font-size:20px;
-  font-weight:600;
-  margin-bottom:15px;
-}
-
-.modal-content input,
-.modal-content select{
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size:14px;
-  font-weight:500;
-}
-
-/* Keep numbers monospaced (fintech feel) */
-.modal-content input[type="number"]{
-  font-family:"JetBrains Mono", monospace;
-}
-
-.modal-content button{
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight:500;
-  letter-spacing:0.5px;
-}
-
-.secondary{
-  background:white;color:black;
-}
-.secondary:hover{
-  background:black;color:white;
-}
 </style>
 </head>
+
 <body>
 <div class="container">
 
@@ -237,7 +273,7 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </table>
 </div>
 
-<!-- BANK PANEL -->
+<!-- BANK -->
 <div class="panel">
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
@@ -254,9 +290,6 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
       <option value="EUR">EUR – Euro</option>
       <option value="GBP">GBP – British Pound</option>
       <option value="JPY">JPY – Japanese Yen</option>
-      <option value="AUD">AUD – Australian Dollar</option>
-      <option value="CAD">CAD – Canadian Dollar</option>
-      <option value="CHF">CHF – Swiss Franc</option>
     </select>
     <input type="number" id="fundInput" placeholder="Amount"/>
     <button onclick="depositFunds()">Submit</button>
@@ -295,9 +328,6 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </div>
 
 <script>
-const API="http://localhost:4000/api";
-const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
-
 document.getElementById("year").innerText=new Date().getFullYear();
 
 /* MODALS */
@@ -306,5 +336,6 @@ function closeDepositModal(){depositModal.style.display="none";}
 function openWithdrawModal(){withdrawModal.style.display="flex";}
 function closeWithdrawModal(){withdrawModal.style.display="none";}
 </script>
+
 </body>
 </html>
