@@ -1,3 +1,85 @@
+/* MODAL ANIMATION */
+.modal{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s ease;
+}
+.modal.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.modal-content{
+  transform:scale(0.95);
+  opacity:0;
+  transition:all 0.25s ease;
+}
+.modal.show .modal-content{
+  transform:scale(1);
+  opacity:1;
+}
+
+/* FLOATING LABEL WRAPPER */
+.field{
+  position:relative;
+  margin-top:18px;
+}
+
+/* INPUT */
+.field input,
+.field select{
+  width:100%;
+  padding:16px 14px 10px 14px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  background:white;
+  font-size:14px;
+  font-family:"Inter", sans-serif;
+}
+
+/* NUMBER KEEP MONO */
+.field input[type="number"]{
+  font-family:"JetBrains Mono", monospace;
+}
+
+/* LABEL */
+.field label{
+  position:absolute;
+  left:12px;
+  top:14px;
+  font-size:13px;
+  color:#777;
+  background:#d4d4d4;
+  padding:0 6px;
+  transition:all 0.2s ease;
+  pointer-events:none;
+}
+
+/* FLOAT STATE */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label,
+.field select:focus + label,
+.field select:valid + label{
+  top:-8px;
+  font-size:11px;
+  color:black;
+}
+
+/* FOCUS */
+.field input:focus,
+.field select:focus{
+  outline:none;
+  border:1px solid black;
+  box-shadow:0 0 0 2px rgba(0,0,0,0.08);
+}
+
+/* ERROR STATE (ready to use) */
+.field.error input{
+  border-color:red;
+}
+.field.error label{
+  color:red;
+}
+
 body {
     margin: 0;
     background-color: #000;
