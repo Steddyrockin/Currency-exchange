@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Currency Exchange</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
-
-<!-- Favicon: coin -->
-<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/4/4c/Coin_icon.png">
-
 <script src="https://js.stripe.com/v3/"></script>
 
 <style>
@@ -158,7 +154,48 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <button id="applePayBtn" class="apple-pay-btn">Pay with  Apple Pay</button>
 </div>
 
-<!-- MODALS OMITTED FOR BREVITY -->
+<!-- DEPOSIT MODAL -->
+<div id="depositModal" class="modal">
+  <div class="modal-content">
+    <h2>Deposit</h2>
+    <select id="currencySelect">
+      <option value="USD">USD – US Dollar</option>
+      <option value="EUR">EUR – Euro</option>
+      <option value="GBP">GBP – British Pound</option>
+      <option value="JPY">JPY – Japanese Yen</option>
+      <option value="AUD">AUD – Australian Dollar</option>
+      <option value="CAD">CAD – Canadian Dollar</option>
+      <option value="CHF">CHF – Swiss Franc</option>
+    </select>
+    <input type="number" id="fundInput" placeholder="Amount"/>
+    <button onclick="depositFunds()">Submit</button>
+    <button class="secondary" onclick="closeDepositModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- SEND MODAL WITH ZELLE -->
+<div id="withdrawModal" class="modal">
+  <div class="modal-content">
+    <h2>Send</h2>
+    <select id="sendMethod" onchange="updateSendFields()">
+      <option value="bank">Bank Transfer</option>
+      <option value="zelle">Zelle</option>
+    </select>
+
+    <div id="bankFields">
+      <input id="routingNumber" placeholder="Routing Number"/>
+      <input id="accountNumber" placeholder="Account Number"/>
+    </div>
+
+    <div id="zelleFields" style="display:none;">
+      <input id="zelleEmail" placeholder="Zelle Email or Phone"/>
+    </div>
+
+    <input id="withdrawAmount" type="number" placeholder="Amount"/>
+    <button onclick="sendToBank()">Submit Transfer</button>
+    <button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <div class="footer">
@@ -168,6 +205,9 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </div>
 
 <script>
+const API="http://localhost:4000/api";
+const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
+let assets=["EURUSD","USDJPY","GBPUSD"];
 document.getElementById("year").innerText=new Date().getFullYear();
 
 /* VIEW SWITCH */
@@ -181,7 +221,6 @@ function switchView(view,el){
 }
 
 /* MARKET TABLE SIMULATION */
-let assets=["EURUSD","USDJPY","GBPUSD"];
 assets.forEach(a=>{
   const row=document.createElement("tr");
   row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="c${a}">-</td><td id="n${a}">-</td>`;
@@ -194,6 +233,88 @@ setInterval(()=>{
   });
 },1000);
 
+/* MODALS */
+function openDepositModal(){depositModal.style.display="flex";}
+function closeDepositModal(){depositModal.style.display="none";}
+function openWithdrawModal(){withdrawModal.style.display="flex";}
+function closeWithdrawModal(){withdrawModal.style.display="none";}
+
+/* DEPOSIT */
+async function depositFunds(){
+  const amt=parseFloat(fundInput.value);
+  if(!amt)return alert("Invalid amount");
+  await fetch(API+"/stripe/deposit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
+  closeDepositModal();
+}
+
+/* SEND / ZELLE */
+function updateSendFields(){
+  const method = sendMethod.value;
+  if(method === "bank"){ bankFields.style.display="block"; zelleFields.style.display="none"; }
+  else{ bankFields.style.display="none"; zelleFields.style.display="block"; }
+}
+
+async function sendToBank(){
+  const method = sendMethod.value;
+  const amount = parseFloat(withdrawAmount.value);
+  if(!amount) return alert("Enter valid amount");
+  let payload = { amount, method };
+  if(method==="bank"){
+    const routing=routingNumber.value.trim();
+    const account=accountNumber.value.trim();
+    if(!routing||!account) return alert("Enter banking details");
+    payload.routingNumber=routing; payload.accountNumber=account;
+  } else {
+    const zEmail=zelleEmail.value.trim();
+    if(!zEmail) return alert("Enter Zelle email/phone");
+    payload.zelle=zEmail;
+  }
+  const res=await fetch(API+"/bank/transfer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(data.success){ alert(`${method==="bank"?"Bank Transfer":"Zelle"} complete`); closeWithdrawModal(); loadTransactions(); }
+  else{ alert("Transfer failed"); }
+}
+
+/* TRANSACTIONS WITH DUMMY DATA */
+async function loadTransactions(){
+  let data = await (await fetch(API+"/transactions")).json();
+  if(!data || data.length === 0){
+    data = [
+      { type: "deposit", amount: 250, status: "completed", time: Date.now()-3600000 },
+      { type: "withdrawal", amount: 100, status: "pending", time: Date.now()-7200000 },
+      { type: "zelle", amount: 50, status: "completed", time: Date.now()-10800000 },
+    ];
+  }
+  txTable.innerHTML="";
+  data.forEach(tx=>{
+    let displayType = tx.type==="withdrawal"?"BANK TRANSFER":tx.type.toUpperCase();
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${displayType}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
+    txTable.appendChild(row);
+  });
+}
+
+/* APPLE PAY - PERSISTENT */
+async function setupApplePay() {
+  const pr = stripe.paymentRequest({country:'US', currency:'usd', total:{label:'Deposit', amount:1000}, requestPayerName:true, requestPayerEmail:true});
+  const applePayBtn = document.getElementById("applePayBtn");
+  applePayBtn.style.display="block";
+  applePayBtn.onclick = async ()=>{
+    const canPay = await pr.canMakePayment();
+    if(!canPay || !canPay.applePay){ alert("Apple Pay not supported"); return; }
+    const amt=parseFloat(document.getElementById("fundInput").value)||10;
+    pr.update({ total:{label:'Deposit',amount:Math.round(amt*100)} });
+    pr.show();
+  };
+  pr.on('paymentmethod',async ev=>{
+    const amt=parseFloat(document.getElementById("fundInput").value)||10;
+    const res=await fetch(API+"/stripe/apple-pay",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
+    const {clientSecret } = await res.json();
+    const {error } = await stripe.confirmCardPayment(clientSecret,{payment_method:ev.paymentMethod.id},{handleActions:false});
+    if(error) ev.complete('fail'); else { ev.complete('success'); alert("Apple Pay deposit successful"); loadTransactions(); }
+  });
+}
+document.addEventListener("DOMContentLoaded",()=>{ setupApplePay(); });
 </script>
 </body>
 </html>
