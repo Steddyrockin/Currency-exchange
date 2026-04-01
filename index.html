@@ -71,7 +71,7 @@ h1{
   margin:auto;
 }
 
-/* GLOBAL INPUTS (non-modal stay dark) */
+/* GLOBAL INPUTS */
 input, select{
   width:100%;
   padding:12px;
@@ -84,7 +84,7 @@ input, select{
   color:white;
 }
 
-/* MODAL BASE */
+/* MODAL */
 .modal{
   position:fixed;
   top:0;left:0;width:100%;height:100%;
@@ -93,9 +93,17 @@ input, select{
   justify-content:center;
   align-items:center;
   z-index:1000;
+
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s ease;
+}
+.modal.show{
+  opacity:1;
+  pointer-events:auto;
 }
 
-/* MODAL CONTAINER */
+/* MODAL CONTENT */
 .modal-content{
   background:#d4d4d4;
   padding:30px;
@@ -104,90 +112,89 @@ input, select{
   width:100%;
   text-align:center;
 
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing:0.3px;
+  font-family:"Inter", sans-serif;
+
+  transform:scale(0.95);
+  opacity:0;
+  transition:all 0.25s ease;
+}
+.modal.show .modal-content{
+  transform:scale(1);
+  opacity:1;
 }
 
-/* MODAL TYPOGRAPHY */
 .modal-content h2{
   font-size:20px;
   font-weight:600;
   margin-bottom:20px;
 }
 
-/* 🔥 PREMIUM MODAL INPUTS */
-.modal-content input,
-.modal-content select{
+/* FLOATING FIELDS */
+.field{
+  position:relative;
+  margin-top:18px;
+}
+
+.field input,
+.field select{
   width:100%;
-  padding:14px;
-  margin-top:12px;
-
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size:14px;
-  font-weight:500;
-
-  background:white;
-  color:black;
+  padding:16px 14px 10px 14px;
   border:1px solid #ccc;
   border-radius:6px;
-
+  background:white;
+  color:black;
+  font-size:14px;
+  font-family:"Inter", sans-serif;
   text-align:left;
-
   transition:all 0.2s ease;
 }
 
-/* Keep numbers monospaced */
-.modal-content input[type="number"]{
+/* Mono numbers */
+.field input[type="number"]{
   font-family:"JetBrains Mono", monospace;
-  letter-spacing:0.5px;
 }
 
-/* Focus state */
-.modal-content input:focus,
-.modal-content select:focus{
+/* LABEL */
+.field label{
+  position:absolute;
+  left:12px;
+  top:14px;
+  font-size:13px;
+  color:#777;
+  background:#d4d4d4;
+  padding:0 6px;
+  transition:all 0.2s ease;
+  pointer-events:none;
+}
+
+/* FLOAT */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label,
+.field select:focus + label,
+.field select:valid + label{
+  top:-8px;
+  font-size:11px;
+  color:black;
+}
+
+/* FOCUS */
+.field input:focus,
+.field select:focus{
   outline:none;
   border:1px solid black;
   box-shadow:0 0 0 2px rgba(0,0,0,0.08);
 }
 
-/* Placeholder */
-.modal-content input::placeholder{
-  color:#888;
-  font-weight:400;
-}
-
-/* Field spacing */
-.modal-content input + input,
-.modal-content input + select,
-.modal-content select + input{
-  margin-top:14px;
-}
-
-/* Custom dropdown arrow */
-.modal select{
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  background-image:url('data:image/svg+xml;utf8,<svg fill="black" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:12px;
-  padding-right:30px;
-  cursor:pointer;
-}
-
 /* BUTTONS */
 button{
   width:100%;
-  margin-top:12px;
+  margin-top:14px;
   padding:12px;
   background:black;
   color:white;
   border:1px solid black;
   cursor:pointer;
-
-  font-family:"Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight:500;
+  font-family:"Inter", sans-serif;
 }
 button:hover{background:white;color:black;}
 
@@ -220,7 +227,6 @@ th,td{
   border-top:1px solid black;
   display:flex;
   justify-content:center;
-  gap:10px;
   font-size:12px;
 }
 </style>
@@ -257,20 +263,6 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </thead>
 <tbody id="tradeTable"></tbody>
 </table>
-
-<div class="panel"><strong>BALANCE</strong><p id="allocatedAmount">$0</p></div>
-<div class="panel"><strong>TOTAL EARNED</strong><p id="totalEarned">$0</p></div>
-</div>
-
-<!-- TRANSACTIONS -->
-<div id="transactionsView" class="view">
-<h1>TRANSACTIONS</h1>
-<table>
-<thead>
-<tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>
-</thead>
-<tbody id="txTable"></tbody>
-</table>
 </div>
 
 <!-- BANK -->
@@ -285,13 +277,21 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <div id="depositModal" class="modal">
   <div class="modal-content">
     <h2>Deposit</h2>
-    <select id="currencySelect">
-      <option value="USD">USD – US Dollar</option>
-      <option value="EUR">EUR – Euro</option>
-      <option value="GBP">GBP – British Pound</option>
-      <option value="JPY">JPY – Japanese Yen</option>
-    </select>
-    <input type="number" id="fundInput" placeholder="Amount"/>
+
+    <div class="field">
+      <select id="currencySelect" required>
+        <option value="" disabled selected></option>
+        <option value="USD">USD – US Dollar</option>
+        <option value="EUR">EUR – Euro</option>
+      </select>
+      <label>Currency</label>
+    </div>
+
+    <div class="field">
+      <input type="number" id="fundInput" placeholder=" " />
+      <label>Amount</label>
+    </div>
+
     <button onclick="depositFunds()">Submit</button>
     <button class="secondary" onclick="closeDepositModal()">Cancel</button>
   </div>
@@ -301,21 +301,40 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <div id="withdrawModal" class="modal">
   <div class="modal-content">
     <h2>Send</h2>
-    <select id="sendMethod" onchange="updateSendFields()">
-      <option value="bank">Bank Transfer</option>
-      <option value="zelle">Zelle</option>
-    </select>
+
+    <div class="field">
+      <select id="sendMethod" onchange="updateSendFields()" required>
+        <option value="" disabled selected></option>
+        <option value="bank">Bank Transfer</option>
+        <option value="zelle">Zelle</option>
+      </select>
+      <label>Method</label>
+    </div>
 
     <div id="bankFields">
-      <input id="routingNumber" placeholder="Routing Number"/>
-      <input id="accountNumber" placeholder="Account Number"/>
+      <div class="field">
+        <input id="routingNumber" placeholder=" " />
+        <label>Routing Number</label>
+      </div>
+
+      <div class="field">
+        <input id="accountNumber" placeholder=" " />
+        <label>Account Number</label>
+      </div>
     </div>
 
     <div id="zelleFields" style="display:none;">
-      <input id="zelleEmail" placeholder="Zelle Email or Phone"/>
+      <div class="field">
+        <input id="zelleEmail" placeholder=" " />
+        <label>Zelle Email or Phone</label>
+      </div>
     </div>
 
-    <input id="withdrawAmount" type="number" placeholder="Amount"/>
+    <div class="field">
+      <input id="withdrawAmount" type="number" placeholder=" " />
+      <label>Amount</label>
+    </div>
+
     <button onclick="sendToBank()">Submit Transfer</button>
     <button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
   </div>
@@ -331,10 +350,34 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 document.getElementById("year").innerText=new Date().getFullYear();
 
 /* MODALS */
-function openDepositModal(){depositModal.style.display="flex";}
-function closeDepositModal(){depositModal.style.display="none";}
-function openWithdrawModal(){withdrawModal.style.display="flex";}
-function closeWithdrawModal(){withdrawModal.style.display="none";}
+function openDepositModal(){
+  depositModal.style.display="flex";
+  setTimeout(()=>depositModal.classList.add("show"),10);
+}
+function closeDepositModal(){
+  depositModal.classList.remove("show");
+  setTimeout(()=>depositModal.style.display="none",250);
+}
+
+function openWithdrawModal(){
+  withdrawModal.style.display="flex";
+  setTimeout(()=>withdrawModal.classList.add("show"),10);
+}
+function closeWithdrawModal(){
+  withdrawModal.classList.remove("show");
+  setTimeout(()=>withdrawModal.style.display="none",250);
+}
+
+/* TOGGLE SEND TYPE */
+function updateSendFields(){
+  if(sendMethod.value==="bank"){
+    bankFields.style.display="block";
+    zelleFields.style.display="none";
+  }else{
+    bankFields.style.display="none";
+    zelleFields.style.display="block";
+  }
+}
 </script>
 
 </body>
