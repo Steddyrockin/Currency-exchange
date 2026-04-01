@@ -38,14 +38,20 @@ input, select{
   color:white;
 }
 
+/* Custom dropdown arrow */
 .modal select {
-  appearance:none;
-  background-image:url('data:image/svg+xml;utf8,<svg fill="white" height="12" viewBox="0 0 24 24" width="12"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  padding-right:30px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+  padding-right: 30px;
+  cursor:pointer;
 }
 
+/* Buttons */
 button{
   width:100%;
   margin-top:12px;
@@ -56,14 +62,17 @@ button{
   cursor:pointer;
 }
 button:hover{background:white;color:black;}
-
-.wallet-btn{padding:14px;margin-top:10px;}
+.apple-pay-btn{margin-top:10px;padding:14px;}
 
 table{width:100%;margin-top:30px;border-collapse:collapse;}
 th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14px;}
 
 .view{display:none;}
 .view.active{display:block;}
+
+.footer{margin-top:50px;padding-top:20px;border-top:1px solid black;display:flex;justify-content:center;gap:10px;font-size:12px;}
+.footer a{color:black;text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
 
 .modal{
   position:fixed;
@@ -72,6 +81,7 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
   display:none;
   justify-content:center;
   align-items:center;
+  z-index:1000;
 }
 .modal-content{
   background:#d4d4d4;
@@ -81,11 +91,14 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
   width:100%;
   text-align:center;
 }
-.secondary{background:white;color:black;}
-.secondary:hover{background:black;color:white;}
+.secondary{
+  background:white;color:black;
+}
+.secondary:hover{
+  background:black;color:white;
+}
 </style>
 </head>
-
 <body>
 <div class="container">
 
@@ -99,7 +112,10 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 <div id="marketView" class="view active">
 <h1>CURRENCY EXCHANGE</h1>
 
-<div class="panel"><strong>GLOBAL DOLLAR</strong><p id="liveGlobal">$0</p></div>
+<div class="panel">
+<strong>GLOBAL DOLLAR</strong>
+<p id="liveGlobal">$0</p>
+</div>
 
 <div class="panel">
 <strong>AI MARKET SYSTEM</strong>
@@ -109,7 +125,9 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </div>
 
 <table>
-<thead><tr><th>ASSET</th><th>VALUE</th><th>CHANGE</th><th>NET %</th></tr></thead>
+<thead>
+<tr><th>ASSET</th><th>VALUE</th><th>CHANGE</th><th>NET %</th></tr>
+</thead>
 <tbody id="tradeTable"></tbody>
 </table>
 
@@ -121,38 +139,67 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <div id="transactionsView" class="view">
 <h1>TRANSACTIONS</h1>
 <table>
-<thead><tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr></thead>
+<thead>
+<tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>
+</thead>
 <tbody id="txTable"></tbody>
 </table>
 </div>
 
-<!-- BANK -->
+<!-- BANK PANEL -->
 <div class="panel">
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
 <button onclick="openWithdrawModal()">Send</button>
-
-<button id="applePayBtn" class="wallet-btn" style="display:none;"> Apple Pay</button>
-<button id="googlePayBtn" class="wallet-btn" style="display:none;">Google Pay</button>
+<button id="applePayBtn" class="apple-pay-btn">Pay with  Apple Pay</button>
 </div>
 
-<!-- MODALS -->
+<!-- DEPOSIT MODAL -->
 <div id="depositModal" class="modal">
-<div class="modal-content">
-<h2>Deposit</h2>
-<input type="number" id="fundInput" placeholder="Amount"/>
-<button onclick="depositFunds()">Submit</button>
-<button class="secondary" onclick="closeDepositModal()">Cancel</button>
-</div>
+  <div class="modal-content">
+    <h2>Deposit</h2>
+    <select id="currencySelect">
+      <option value="USD">USD – US Dollar</option>
+      <option value="EUR">EUR – Euro</option>
+      <option value="GBP">GBP – British Pound</option>
+      <option value="JPY">JPY – Japanese Yen</option>
+      <option value="AUD">AUD – Australian Dollar</option>
+      <option value="CAD">CAD – Canadian Dollar</option>
+      <option value="CHF">CHF – Swiss Franc</option>
+    </select>
+    <input type="number" id="fundInput" placeholder="Amount"/>
+    <button onclick="depositFunds()">Submit</button>
+    <button class="secondary" onclick="closeDepositModal()">Cancel</button>
+  </div>
 </div>
 
+<!-- SEND MODAL WITH ZELLE -->
 <div id="withdrawModal" class="modal">
-<div class="modal-content">
-<h2>Send</h2>
-<input id="withdrawAmount" type="number" placeholder="Amount"/>
-<button onclick="sendToBank()">Submit</button>
-<button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
+  <div class="modal-content">
+    <h2>Send</h2>
+    <select id="sendMethod" onchange="updateSendFields()">
+      <option value="bank">Bank Transfer</option>
+      <option value="zelle">Zelle</option>
+    </select>
+
+    <div id="bankFields">
+      <input id="routingNumber" placeholder="Routing Number"/>
+      <input id="accountNumber" placeholder="Account Number"/>
+    </div>
+
+    <div id="zelleFields" style="display:none;">
+      <input id="zelleEmail" placeholder="Zelle Email or Phone"/>
+    </div>
+
+    <input id="withdrawAmount" type="number" placeholder="Amount"/>
+    <button onclick="sendToBank()">Submit Transfer</button>
+    <button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
+  </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+<span>© <span id="year"></span> Clean, Inc.</span>
 </div>
 
 </div>
@@ -160,6 +207,31 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 <script>
 const API="http://localhost:4000/api";
 const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
+let assets=["EURUSD","USDJPY","GBPUSD"];
+document.getElementById("year").innerText=new Date().getFullYear();
+
+/* VIEW SWITCH */
+function switchView(view,el){
+  event.preventDefault();
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
+  if(view==="market")marketView.classList.add("active");
+  if(view==="transactions"){transactionsView.classList.add("active");loadTransactions();}
+  el.classList.add("active");
+}
+
+/* MARKET TABLE SIMULATION */
+assets.forEach(a=>{
+  const row=document.createElement("tr");
+  row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="c${a}">-</td><td id="n${a}">-</td>`;
+  tradeTable.appendChild(row);
+});
+setInterval(()=>{
+  assets.forEach(a=>{
+    const val=Math.random()*2;
+    document.getElementById(a).innerText=val.toFixed(4);
+  });
+},1000);
 
 /* MODALS */
 function openDepositModal(){depositModal.style.display="flex";}
@@ -167,59 +239,82 @@ function closeDepositModal(){depositModal.style.display="none";}
 function openWithdrawModal(){withdrawModal.style.display="flex";}
 function closeWithdrawModal(){withdrawModal.style.display="none";}
 
-/* WALLET PAYMENTS */
-async function setupWalletPayments(){
-  const pr=stripe.paymentRequest({
-    country:'US',
-    currency:'usd',
-    total:{label:'Deposit',amount:1000},
-    requestPayerName:true,
-    requestPayerEmail:true
-  });
+/* DEPOSIT */
+async function depositFunds(){
+  const amt=parseFloat(fundInput.value);
+  if(!amt)return alert("Invalid amount");
+  await fetch(API+"/stripe/deposit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
+  closeDepositModal();
+}
 
-  const result=await pr.canMakePayment();
+/* SEND / ZELLE */
+function updateSendFields(){
+  const method = sendMethod.value;
+  if(method === "bank"){ bankFields.style.display="block"; zelleFields.style.display="none"; }
+  else{ bankFields.style.display="none"; zelleFields.style.display="block"; }
+}
 
-  if(result){
-    if(result.applePay) applePayBtn.style.display="block";
-    if(result.googlePay) googlePayBtn.style.display="block";
+async function sendToBank(){
+  const method = sendMethod.value;
+  const amount = parseFloat(withdrawAmount.value);
+  if(!amount) return alert("Enter valid amount");
+  let payload = { amount, method };
+  if(method==="bank"){
+    const routing=routingNumber.value.trim();
+    const account=accountNumber.value.trim();
+    if(!routing||!account) return alert("Enter banking details");
+    payload.routingNumber=routing; payload.accountNumber=account;
+  } else {
+    const zEmail=zelleEmail.value.trim();
+    if(!zEmail) return alert("Enter Zelle email/phone");
+    payload.zelle=zEmail;
   }
+  const res=await fetch(API+"/bank/transfer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(data.success){ alert(`${method==="bank"?"Bank Transfer":"Zelle"} complete`); closeWithdrawModal(); loadTransactions(); }
+  else{ alert("Transfer failed"); }
+}
 
-  async function handlePayment(){
-    const amt=parseFloat(fundInput.value)||10;
-    pr.update({total:{label:'Deposit',amount:Math.round(amt*100)}});
-    pr.show();
+/* TRANSACTIONS WITH DUMMY DATA */
+async function loadTransactions(){
+  let data = await (await fetch(API+"/transactions")).json();
+  if(!data || data.length === 0){
+    data = [
+      { type: "deposit", amount: 250, status: "completed", time: Date.now()-3600000 },
+      { type: "withdrawal", amount: 100, status: "pending", time: Date.now()-7200000 },
+      { type: "zelle", amount: 50, status: "completed", time: Date.now()-10800000 },
+    ];
   }
-
-  applePayBtn.onclick=handlePayment;
-  googlePayBtn.onclick=handlePayment;
-
-  pr.on('paymentmethod',async ev=>{
-    const amt=parseFloat(fundInput.value)||10;
-
-    const res=await fetch(API+"/stripe/wallet-pay",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({amount:amt})
-    });
-
-    const {clientSecret}=await res.json();
-
-    const {error}=await stripe.confirmCardPayment(
-      clientSecret,
-      {payment_method:ev.paymentMethod.id},
-      {handleActions:false}
-    );
-
-    if(error){
-      ev.complete('fail');
-    }else{
-      ev.complete('success');
-      alert("Payment successful");
-    }
+  txTable.innerHTML="";
+  data.forEach(tx=>{
+    let displayType = tx.type==="withdrawal"?"BANK TRANSFER":tx.type.toUpperCase();
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${displayType}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
+    txTable.appendChild(row);
   });
 }
 
-document.addEventListener("DOMContentLoaded",setupWalletPayments);
+/* APPLE PAY - PERSISTENT */
+async function setupApplePay() {
+  const pr = stripe.paymentRequest({country:'US', currency:'usd', total:{label:'Deposit', amount:1000}, requestPayerName:true, requestPayerEmail:true});
+  const applePayBtn = document.getElementById("applePayBtn");
+  applePayBtn.style.display="block";
+  applePayBtn.onclick = async ()=>{
+    const canPay = await pr.canMakePayment();
+    if(!canPay || !canPay.applePay){ alert("Apple Pay not supported"); return; }
+    const amt=parseFloat(document.getElementById("fundInput").value)||10;
+    pr.update({ total:{label:'Deposit',amount:Math.round(amt*100)} });
+    pr.show();
+  };
+  pr.on('paymentmethod',async ev=>{
+    const amt=parseFloat(document.getElementById("fundInput").value)||10;
+    const res=await fetch(API+"/stripe/apple-pay",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
+    const {clientSecret } = await res.json();
+    const {error } = await stripe.confirmCardPayment(clientSecret,{payment_method:ev.paymentMethod.id},{handleActions:false});
+    if(error) ev.complete('fail'); else { ev.complete('success'); alert("Apple Pay deposit successful"); loadTransactions(); }
+  });
+}
+document.addEventListener("DOMContentLoaded",()=>{ setupApplePay(); });
 </script>
 </body>
 </html>
