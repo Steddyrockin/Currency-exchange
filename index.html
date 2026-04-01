@@ -97,6 +97,28 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 .secondary:hover{
   background:black;color:white;
 }
+
+/* TRANSACTIONS STATUS STYLES */
+.status{
+  padding:4px 8px;
+  border:1px solid black;
+  font-size:12px;
+  display:inline-block;
+}
+.status-completed{
+  background:black;
+  color:white;
+}
+.status-pending{
+  background:white;
+  color:black;
+  opacity:0.7;
+}
+.status-failed{
+  background:black;
+  color:white;
+  text-decoration:line-through;
+}
 </style>
 </head>
 <body>
@@ -245,6 +267,7 @@ async function depositFunds(){
   if(!amt)return alert("Invalid amount");
   await fetch(API+"/stripe/deposit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:amt})});
   closeDepositModal();
+  loadTransactions();
 }
 
 /* SEND / ZELLE */
@@ -275,9 +298,10 @@ async function sendToBank(){
   else{ alert("Transfer failed"); }
 }
 
-/* TRANSACTIONS WITH DUMMY DATA */
+/* TRANSACTIONS WITH FORMATTED TABLE */
 async function loadTransactions(){
   let data = await (await fetch(API+"/transactions")).json();
+
   if(!data || data.length === 0){
     data = [
       { type: "deposit", amount: 250, status: "completed", time: Date.now()-3600000 },
@@ -285,13 +309,54 @@ async function loadTransactions(){
       { type: "zelle", amount: 50, status: "completed", time: Date.now()-10800000 },
     ];
   }
+
   txTable.innerHTML="";
+
   data.forEach(tx=>{
-    let displayType = tx.type==="withdrawal"?"BANK TRANSFER":tx.type.toUpperCase();
     const row=document.createElement("tr");
-    row.innerHTML=`<td>${displayType}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.status}</td><td>${new Date(tx.time).toLocaleString()}</td>`;
+
+    // TYPE FORMATTING
+    let displayType = "";
+    if(tx.type === "deposit") displayType = "DEPOSIT";
+    else if(tx.type === "withdrawal") displayType = "BANK TRANSFER";
+    else if(tx.type === "zelle") displayType = "ZELLE";
+    else displayType = tx.type.toUpperCase();
+
+    // AMOUNT FORMATTING
+    const formattedAmount = `$${Number(tx.amount).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+
+    // STATUS BADGE
+    let statusClass = "";
+    if(tx.status === "completed") statusClass = "status-completed";
+    else if(tx.status === "pending") statusClass = "status-pending";
+    else statusClass = "status-failed";
+
+    const statusHTML = `<span class="status ${statusClass}">${tx.status.toUpperCase()}</span>`;
+
+    // TIME FORMAT (RELATIVE)
+    const timeAgo = getTimeAgo(tx.time);
+
+    row.innerHTML = `
+      <td>${displayType}</td>
+      <td>${formattedAmount}</td>
+      <td>${statusHTML}</td>
+      <td>${timeAgo}</td>
+    `;
+
     txTable.appendChild(row);
   });
+}
+
+/* HELPER: RELATIVE TIME */
+function getTimeAgo(timestamp){
+  const seconds = Math.floor((Date.now() - timestamp)/1000);
+  if(seconds < 60) return `${seconds}s ago`;
+  if(seconds < 3600) return `${Math.floor(seconds/60)}m ago`;
+  if(seconds < 86400) return `${Math.floor(seconds/3600)}h ago`;
+  return new Date(timestamp).toLocaleDateString();
 }
 
 /* APPLE PAY - PERSISTENT */
