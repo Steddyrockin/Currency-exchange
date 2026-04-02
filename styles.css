@@ -1,3 +1,39 @@
+/* STATUS MESSAGES */
+.message{
+  margin-top:12px;
+  padding:10px;
+  font-size:13px;
+  border:1px solid black;
+}
+
+.message.error{
+  background:#000;
+  color:#fff;
+}
+
+.message.success{
+  background:#fff;
+  color:#000;
+}
+
+/* BUTTON LOADING STATE */
+button.loading{
+  opacity:0.6;
+  pointer-events:none;
+}
+
+/* MODAL IMPROVEMENTS */
+.modal-content h2{
+  margin-bottom:10px;
+  letter-spacing:1px;
+}
+
+.modal-content p{
+  font-size:13px;
+  margin-bottom:15px;
+  line-height:1.5;
+}
+
 /* MODAL ANIMATION */
 .modal{
   opacity:0;
