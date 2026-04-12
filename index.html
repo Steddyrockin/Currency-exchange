@@ -146,6 +146,148 @@ Currency Exchange monitors global markets in real time, analyzes price patterns,
 </table>
 </div>
 
+<script>
+const API="http://localhost:4000/api";
+const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
+
+let assets=["EURUSD","USDJPY","GBPUSD"];
+
+/* -------------------------
+   VIEW SWITCH
+--------------------------*/
+function switchView(view,el){
+  event.preventDefault();
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
+  if(view==="market")marketView.classList.add("active");
+  if(view==="transactions")transactionsView.classList.add("active");
+  el.classList.add("active");
+}
+
+/* -------------------------
+   TABLE INIT
+--------------------------*/
+assets.forEach(a=>{
+  const row=document.createElement("tr");
+  row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td>-</td><td>-</td>`;
+  tradeTable.appendChild(row);
+});
+
+/* -------------------------
+   REAL TIME CHART SETUP
+--------------------------*/
+const ctx = document.getElementById("assetChart").getContext("2d");
+
+const chartData = {
+  labels: [],
+  datasets: [{
+    label: "GLOBAL DOLLAR INDEX",
+    data: [],
+    borderColor: "black",
+    borderWidth: 2,
+    fill: false,
+    tension: 0.2
+  }]
+};
+
+const assetChart = new Chart(ctx, {
+  type: "line",
+  data: chartData,
+  options: {
+    responsive: true,
+    animation: false,
+    scales: {
+      x: { display: false },
+      y: { beginAtZero: false }
+    },
+    plugins: {
+      legend: { display: true }
+    }
+  }
+});
+
+/* -------------------------
+   MARKET SIMULATION + UPDATE
+--------------------------*/
+let globalValue = 100;
+
+setInterval(()=>{
+  globalValue += (Math.random()-0.5)*2;
+  document.getElementById("liveGlobal").innerText = "$" + globalValue.toFixed(4);
+
+  // update table
+  assets.forEach(a=>{
+    const val=Math.random()*2;
+    document.getElementById(a).innerText=val.toFixed(4);
+  });
+
+  // update chart
+  const now = new Date().toLocaleTimeString();
+
+  chartData.labels.push(now);
+  chartData.datasets[0].data.push(globalValue);
+
+  if(chartData.labels.length > 60){
+    chartData.labels.shift();
+    chartData.datasets[0].data.shift();
+  }
+
+  assetChart.update();
+
+},1000);
+
+/* -------------------------
+   TRANSACTIONS (dummy)
+--------------------------*/
+async function loadTransactions(){
+  let data = await (await fetch(API+"/transactions")).json();
+  if(!data || !data.length){
+    data = [
+      { type:"deposit", amount:250, status:"completed", time:Date.now()-3600000 },
+      { type:"withdrawal", amount:100, status:"pending", time:Date.now()-7200000 }
+    ];
+  }
+
+  txTable.innerHTML="";
+  data.forEach(tx=>{
+    const row=document.createElement("tr");
+    row.innerHTML=
+      `<td>${tx.type.toUpperCase()}</td>
+       <td>$${tx.amount.toFixed(2)}</td>
+       <td>${tx.status}</td>
+       <td>${new Date(tx.time).toLocaleString()}</td>`;
+    txTable.appendChild(row);
+  });
+}
+</script>
+
+</body>
+</html>
+</p>
+</div>
+
+<table>
+<thead>
+<tr><th>ASSET</th><th>VALUE</th><th>CHANGE</th><th>NET %</th></tr>
+</thead>
+<tbody id="tradeTable"></tbody>
+</table>
+
+<div class="panel"><strong>BALANCE</strong><p id="allocatedAmount">$0</p></div>
+<div class="panel"><strong>TOTAL EARNED</strong><p id="totalEarned">$0</p></div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="transactionsView" class="view">
+<h1>TRANSACTIONS</h1>
+<table>
+<thead>
+<tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>
+</thead>
+<tbody id="txTable"></tbody>
+</table>
+</div>
+
 <!-- BANK PANEL -->
 <div class="panel">
 <strong>BANK</strong>
