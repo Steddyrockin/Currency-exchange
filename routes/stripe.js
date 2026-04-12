@@ -1,33 +1,32 @@
-const express = require("express")
-const router = express.Router()
+const router = require("express").Router()
+const Stripe = require("stripe")
+const store = require("../state/store")
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
+const stripe = new Stripe(process.env.STRIPE_SECRET)
 
-router.post("/deposit",async(req,res)=>{
+router.post("/deposit", async (req, res) => {
 
-const {amount} = req.body
+  const { amount } = req.body
 
-const session = await stripe.checkout.sessions.create({
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: "Invalid amount" })
+  }
 
-payment_method_types:["card"],
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: Math.floor(amount * 100),
+    currency: "usd"
+  })
 
-line_items:[{
-price_data:{
-currency:"usd",
-product_data:{name:"Currency Exchange Deposit"},
-unit_amount:Math.round(amount*100)
-},
-quantity:1
-}],
+  store.portfolio.balance += amount
 
-mode:"payment",
+  store.transactions.push({
+    type: "DEPOSIT",
+    amount,
+    status: "SUCCESS",
+    time: new Date().toISOString()
+  })
 
-success_url:"http://localhost:3000",
-cancel_url:"http://localhost:3000"
-
-})
-
-res.json({id:session.id})
+  res.json({ clientSecret: paymentIntent.client_secret })
 
 })
 
