@@ -197,7 +197,6 @@ Real-time adaptive trading system analyzing global markets and dynamically alloc
 </table>
 </div>
 
-<!-- BANK -->
 <div class="panel">
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
@@ -213,8 +212,9 @@ Real-time adaptive trading system analyzing global markets and dynamically alloc
 
 <script>
 const stripe = Stripe("pk_test_YOUR_PUBLIC_KEY");
-const assets=["EURUSD","USDJPY","GBPUSD"];
-document.getElementById("year").innerText=new Date().getFullYear();
+const assets = ["EURUSD","USDJPY","GBPUSD"];
+
+document.getElementById("year").innerText = new Date().getFullYear();
 
 /* TABLE */
 assets.forEach(a=>{
@@ -223,7 +223,10 @@ assets.forEach(a=>{
   tradeTable.appendChild(row);
 });
 
-/* CHART PLUGINS */
+/* CHART DATA */
+let assetValues = [0,0,0];
+
+/* CROSSHAIR */
 const crosshairPlugin={
   id:'crosshair',
   afterDraw(chart){
@@ -250,6 +253,7 @@ const crosshairPlugin={
   }
 };
 
+/* PRICE LABEL */
 const priceLabelPlugin={
   id:'priceLabel',
   afterDraw(chart){
@@ -268,21 +272,19 @@ const priceLabelPlugin={
   }
 };
 
-/* CHART */
 const ctx=document.getElementById("valueChart").getContext("2d");
-let chartData=[];
-let chartLabels=[];
 
 const valueChart=new Chart(ctx,{
   type:"line",
   data:{
-    labels:chartLabels,
+    labels:assets,
     datasets:[{
-      data:chartData,
+      label:"Asset Value",
+      data:assetValues,
       borderColor:"#000",
       tension:0,
       borderWidth:1.5,
-      pointRadius:(ctx)=>ctx.dataIndex===chartData.length-1?3:0,
+      pointRadius:3,
       pointBackgroundColor:"#000"
     }]
   },
@@ -293,6 +295,12 @@ const valueChart=new Chart(ctx,{
     interaction:{mode:"index",intersect:false},
     plugins:{
       legend:{display:false},
+      title:{
+        display:true,
+        text:"GLOBAL DOLLAR VALUE BY ASSET",
+        color:"#000",
+        font:{family:"JetBrains Mono",size:14}
+      },
       tooltip:{
         backgroundColor:"#000",
         titleColor:"#fff",
@@ -303,12 +311,13 @@ const valueChart=new Chart(ctx,{
     },
     scales:{
       x:{
-        ticks:{color:"#000",font:{family:"JetBrains Mono",size:10},maxTicksLimit:5},
+        title:{display:true,text:"ASSET",color:"#000"},
+        ticks:{color:"#000",font:{family:"JetBrains Mono",size:10}},
         grid:{display:false},
         border:{color:"#000"}
       },
       y:{
-        ticks:{color:"#000",font:{family:"JetBrains Mono",size:10},callback:v=>"$"+v,maxTicksLimit:5},
+        ticks:{color:"#000",font:{family:"JetBrains Mono",size:10},callback:v=>"$"+v},
         grid:{color:"rgba(0,0,0,0.08)",lineWidth:0.5},
         border:{color:"#000"}
       }
@@ -318,29 +327,25 @@ const valueChart=new Chart(ctx,{
 });
 
 /* LIVE DATA */
-let globalValue=100;
+let globalValue = 100;
 
 setInterval(()=>{
+
   assets.forEach(a=>{
-    const val=Math.random()*2;
-    document.getElementById(a).innerText=val.toFixed(4);
+    const val = (Math.random()*2).toFixed(4);
+    document.getElementById(a).innerText = val;
   });
 
-  globalValue+=(Math.random()-0.5)*2;
-  if(globalValue<0)globalValue=0;
+  globalValue += (Math.random()-0.5)*2;
+  if(globalValue < 0) globalValue = 0;
 
-  liveGlobal.innerText="$"+globalValue.toFixed(2);
+  liveGlobal.innerText = "$" + globalValue.toFixed(2);
 
-  const time=new Date().toLocaleTimeString();
+  assetValues = assets.map(() =>
+    (Math.random()*2 + globalValue).toFixed(4)
+  );
 
-  chartLabels.push(time);
-  chartData.push(globalValue.toFixed(2));
-
-  if(chartData.length>30){
-    chartData.shift();
-    chartLabels.shift();
-  }
-
+  valueChart.data.datasets[0].data = assetValues;
   valueChart.update();
 
 },1000);
