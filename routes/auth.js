@@ -1,17 +1,16 @@
-const express = require("express")
+const router = require("express").Router()
 const jwt = require("jsonwebtoken")
 
-const router = express.Router()
+router.post("/login",(req,res)=>{
 
-router.post("/facebook",(req,res)=>{
+  // simple demo login (replace later)
+  const user = { id:1 }
 
-const token = jwt.sign(
-{user:"facebook"},
-process.env.JWT_SECRET,
-{expiresIn:"7d"}
-)
+  const token = jwt.sign(user, process.env.JWT_SECRET, {
+    expiresIn:"7d"
+  })
 
-res.json({token})
+  res.json({token})
 
 })
 
