@@ -15,7 +15,13 @@
   --text:#000;
 }
 *{box-sizing:border-box;}
-body{margin:0;padding:40px;background:var(--bg);color:var(--text);font-family:"JetBrains Mono",monospace;}
+body{
+  margin:0;
+  padding:40px;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"JetBrains Mono",monospace;
+}
 .container{max-width:1000px;margin:auto;}
 
 h1{
@@ -55,14 +61,21 @@ h1{
 
 .panel strong{display:block;margin-bottom:12px;}
 
+canvas{
+  width:100%!important;
+}
+
+/* ✅ BIGGER GRAPH */
+#valueChart{
+  height:260px !important;
+}
+
 .blurb{
   font-size:14px;
   line-height:1.6;
   max-width:700px;
   margin:auto;
 }
-
-canvas{width:100%!important;}
 
 input, select{
   width:100%;
@@ -154,7 +167,7 @@ th,td{
 
 <div class="panel">
 <strong>VALUE TREND</strong>
-<canvas id="valueChart" height="100"></canvas>
+<canvas id="valueChart"></canvas>
 </div>
 
 <div class="panel">
@@ -213,7 +226,7 @@ assets.forEach(a=>{
   tradeTable.appendChild(row);
 });
 
-/* CHART SETUP */
+/* CHART */
 const ctx=document.getElementById("valueChart").getContext("2d");
 let chartData=[];
 let chartLabels=[];
@@ -223,7 +236,6 @@ const valueChart=new Chart(ctx,{
   data:{
     labels:chartLabels,
     datasets:[{
-      label:"Global Dollar",
       data:chartData,
       borderColor:"#000",
       backgroundColor:"transparent",
@@ -234,10 +246,9 @@ const valueChart=new Chart(ctx,{
   },
   options:{
     responsive:true,
+    maintainAspectRatio:false, // ✅ allows taller chart
     animation:false,
-    plugins:{
-      legend:{display:false}
-    },
+    plugins:{legend:{display:false}},
     scales:{
       x:{
         display:true,
@@ -247,15 +258,13 @@ const valueChart=new Chart(ctx,{
       y:{
         display:true,
         title:{display:true,text:"Value ($)"},
-        ticks:{
-          callback:(v)=>"$"+v
-        }
+        ticks:{callback:(v)=>"$"+v}
       }
     }
   }
 });
 
-/* LIVE SIMULATION */
+/* LIVE DATA */
 let globalValue=100;
 
 setInterval(()=>{
