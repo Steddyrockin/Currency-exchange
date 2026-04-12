@@ -62,9 +62,7 @@ h1{
   margin:auto;
 }
 
-canvas{
-  width:100%!important;
-}
+canvas{width:100%!important;}
 
 input, select{
   width:100%;
@@ -76,14 +74,6 @@ input, select{
   font-size:14px;
   background:black;
   color:white;
-}
-
-.modal select{
-  appearance:none;
-  background-image:url('data:image/svg+xml;utf8,<svg fill="white" height="12" viewBox="0 0 24 24" width="12"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  padding-right:30px;
 }
 
 button{
@@ -162,7 +152,6 @@ th,td{
 <p id="liveGlobal">$100.00</p>
 </div>
 
-<!-- GRAPH -->
 <div class="panel">
 <strong>VALUE TREND</strong>
 <canvas id="valueChart" height="100"></canvas>
@@ -224,7 +213,7 @@ assets.forEach(a=>{
   tradeTable.appendChild(row);
 });
 
-/* CHART */
+/* CHART SETUP */
 const ctx=document.getElementById("valueChart").getContext("2d");
 let chartData=[];
 let chartLabels=[];
@@ -234,16 +223,35 @@ const valueChart=new Chart(ctx,{
   data:{
     labels:chartLabels,
     datasets:[{
+      label:"Global Dollar",
       data:chartData,
+      borderColor:"#000",
+      backgroundColor:"transparent",
       tension:0.2,
-      borderWidth:1,
+      borderWidth:2,
       pointRadius:0
     }]
   },
   options:{
+    responsive:true,
     animation:false,
-    plugins:{legend:{display:false}},
-    scales:{x:{display:false}}
+    plugins:{
+      legend:{display:false}
+    },
+    scales:{
+      x:{
+        display:true,
+        title:{display:true,text:"Time"},
+        ticks:{maxTicksLimit:6}
+      },
+      y:{
+        display:true,
+        title:{display:true,text:"Value ($)"},
+        ticks:{
+          callback:(v)=>"$"+v
+        }
+      }
+    }
   }
 });
 
@@ -251,12 +259,9 @@ const valueChart=new Chart(ctx,{
 let globalValue=100;
 
 setInterval(()=>{
-  let total=0;
-
   assets.forEach(a=>{
     const val=Math.random()*2;
     document.getElementById(a).innerText=val.toFixed(4);
-    total+=val;
   });
 
   globalValue+=(Math.random()-0.5)*2;
@@ -264,8 +269,10 @@ setInterval(()=>{
 
   liveGlobal.innerText="$"+globalValue.toFixed(2);
 
+  const time=new Date().toLocaleTimeString();
+
+  chartLabels.push(time);
   chartData.push(globalValue.toFixed(2));
-  chartLabels.push("");
 
   if(chartData.length>30){
     chartData.shift();
@@ -282,7 +289,7 @@ function switchView(view,el){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
   if(view==="market")marketView.classList.add("active");
-  if(view==="transactions"){transactionsView.classList.add("active");}
+  if(view==="transactions")transactionsView.classList.add("active");
   el.classList.add("active");
 }
 </script>
