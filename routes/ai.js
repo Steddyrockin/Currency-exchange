@@ -1,12 +1,23 @@
-const express = require("express")
+const router = require("express").Router()
+const store = require("../state/store")
 
-const router = express.Router()
+router.post("/run", (req, res) => {
 
-router.post("/run",(req,res)=>{
+  const movement = (Math.random() - 0.4) * 5
 
-console.log("AI trading engine started")
+  if (movement > 0) {
+    store.portfolio.balance += movement
+    store.portfolio.totalEarned += movement
+  }
 
-res.json({status:"running"})
+  store.transactions.push({
+    type: "AI_TRADE",
+    amount: movement.toFixed(2),
+    status: movement > 0 ? "PROFIT" : "HOLD",
+    time: new Date().toISOString()
+  })
+
+  res.json({ success: true, movement })
 
 })
 
