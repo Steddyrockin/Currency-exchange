@@ -6,7 +6,6 @@
 <title>Currency Exchange</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
@@ -116,10 +115,6 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 <div class="panel">
 <strong>GLOBAL DOLLAR</strong>
 <p id="liveGlobal">$0</p>
-
-<!-- 🔥 ADD THIS -->
-<canvas id="valueChart" style="margin-top:20px;"></canvas>
-
 </div>
 
 <div class="panel">
@@ -231,83 +226,12 @@ assets.forEach(a=>{
   row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="c${a}">-</td><td id="n${a}">-</td>`;
   tradeTable.appendChild(row);
 });
-/* =========================
-   REAL MARKET ENGINE
-========================= */
-
-let chartLabels = [];
-let chartData = [];
-
-const ctx = document.getElementById("valueChart").getContext("2d");
-
-const valueChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: chartLabels,
-    datasets: [{
-      data: chartData,
-      borderColor: "black",
-      borderWidth: 2,
-      tension: 0.25,
-      pointRadius: 0
-    }]
-  },
-  options: {
-    responsive: true,
-    animation: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { display: true }
-    }
-  }
-});
-
-/* FETCH REAL FX DATA */
-async function fetchMarket(){
-  try{
-    const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
-    const data = await res.json();
-
-    const EURUSD = 1 / data.rates.EUR;
-    const USDJPY = data.rates.JPY;
-    const GBPUSD = 1 / data.rates.GBP;
-
-    // Update table
-    document.getElementById("EURUSD").innerText = EURUSD.toFixed(4);
-    document.getElementById("USDJPY").innerText = USDJPY.toFixed(4);
-    document.getElementById("GBPUSD").innerText = GBPUSD.toFixed(4);
-
-    /* GLOBAL VALUE MODEL (composite index) */
-    const globalValue =
-      (EURUSD * 0.4) +
-      (USDJPY * 0.3 / 100) +
-      (GBPUSD * 0.3);
-
-    document.getElementById("liveGlobal").innerText =
-      "$" + globalValue.toFixed(4);
-
-    /* UPDATE GRAPH */
-    const time = new Date().toLocaleTimeString();
-
-    chartLabels.push(time);
-    chartData.push(globalValue);
-
-    if(chartLabels.length > 50){
-      chartLabels.shift();
-      chartData.shift();
-    }
-
-    valueChart.update();
-
-  } catch(err){
-    console.error("Market fetch error:", err);
-  }
-}
-
-/* RUN LOOP */
-setInterval(fetchMarket, 3000);
-fetchMarket();
+setInterval(()=>{
+  assets.forEach(a=>{
+    const val=Math.random()*2;
+    document.getElementById(a).innerText=val.toFixed(4);
+  });
+},1000);
 
 /* MODALS */
 function openDepositModal(){depositModal.style.display="flex";}
@@ -391,40 +315,6 @@ async function setupApplePay() {
   });
 }
 document.addEventListener("DOMContentLoaded",()=>{ setupApplePay(); });
-
-/* =========================
-   REAL-TIME VALUE GRAPH
-========================= */
-let globalPrice = 100;
-let chartLabels = [];
-let chartData = [];
-
-const ctx = document.getElementById("valueChart").getContext("2d");
-
-const valueChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: chartLabels,
-    datasets: [{
-      label: "Value Trend",
-      data: chartData,
-      borderColor: "black",
-      borderWidth: 2,
-      tension: 0.25,
-      pointRadius: 0
-    }]
-  },
-  options: {
-    responsive: true,
-    animation: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { display: true }
-    }
-  }
-});
-
 </script>
 </body>
 </html>
