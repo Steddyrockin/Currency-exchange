@@ -320,6 +320,39 @@ async function setupApplePay() {
   });
 }
 document.addEventListener("DOMContentLoaded",()=>{ setupApplePay(); });
+
+/* =========================
+   REAL-TIME VALUE GRAPH
+========================= */
+let globalPrice = 100;
+let chartLabels = [];
+let chartData = [];
+
+const ctx = document.getElementById("valueChart").getContext("2d");
+
+const valueChart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: chartLabels,
+    datasets: [{
+      label: "Value Trend",
+      data: chartData,
+      borderColor: "black",
+      borderWidth: 2,
+      tension: 0.25,
+      pointRadius: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    animation: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { display: false },
+      y: { display: true }
+    }
+  }
+});
 </script>
 </body>
 </html>
