@@ -6,7 +6,6 @@
 <title>Currency Exchange</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
@@ -116,16 +115,12 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 <div class="panel">
 <strong>GLOBAL DOLLAR</strong>
 <p id="liveGlobal">$0</p>
-
-<!-- 🔥 ADD THIS -->
-<canvas id="valueChart" style="margin-top:20px;"></canvas>
-
 </div>
 
 <div class="panel">
 <strong>AI MARKET SYSTEM</strong>
 <p class="blurb">
-Real-time adaptive trading system analyzing global markets and dynamically allocating capital.
+Currency Exchange monitors global markets in real time, analyzes price patterns, and automatically executes trades.
 </p>
 </div>
 
@@ -320,39 +315,6 @@ async function setupApplePay() {
   });
 }
 document.addEventListener("DOMContentLoaded",()=>{ setupApplePay(); });
-
-/* =========================
-   REAL-TIME VALUE GRAPH
-========================= */
-let globalPrice = 100;
-let chartLabels = [];
-let chartData = [];
-
-const ctx = document.getElementById("valueChart").getContext("2d");
-
-const valueChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: chartLabels,
-    datasets: [{
-      label: "Value Trend",
-      data: chartData,
-      borderColor: "black",
-      borderWidth: 2,
-      tension: 0.25,
-      pointRadius: 0
-    }]
-  },
-  options: {
-    responsive: true,
-    animation: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { display: true }
-    }
-  }
-});
 </script>
 </body>
 </html>
