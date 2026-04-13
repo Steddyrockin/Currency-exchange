@@ -122,7 +122,126 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 <div class="panel">
 <strong>AI MARKET SYSTEM</strong>
 <p class="blurb">
-Currency Exchange monitors global markets in real time, analyzes price patterns, and automatically executes trades.
+Currency Exchange monitors global markets in real time and executes trades automatically.
+</p>
+</div>
+
+<table>
+<thead>
+<tr><th>ASSET</th><th>VALUE</th><th>CHANGE</th><th>NET %</th></tr>
+</thead>
+<tbody id="tradeTable"></tbody>
+</table>
+</div>
+
+<div class="footer">
+<span>© <span id="year"></span> Clean, Inc.</span>
+</div>
+
+</div>
+
+<script>
+const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
+
+let assets=["EURUSD","USDJPY","GBPUSD"];
+let chart;
+let chartPoints=[];
+
+document.getElementById("year").innerText=new Date().getFullYear();
+
+/* TABLE INIT */
+assets.forEach(a=>{
+  const row=document.createElement("tr");
+  row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="c${a}">-</td><td id="n${a}">-</td>`;
+  tradeTable.appendChild(row);
+});
+
+/* CHART INIT (MATCHED DESIGN) */
+function initChart(){
+  const ctx=document.getElementById("trendChart");
+
+  chart=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[{
+        data:[],
+        borderColor:"#000",
+        backgroundColor:"rgba(0,0,0,0.05)",
+        borderWidth:1,
+        pointRadius:0,
+        tension:0,
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,
+      animation:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:"#000",
+          titleColor:"#fff",
+          bodyColor:"#fff",
+          borderColor:"#000",
+          borderWidth:1
+        }
+      },
+      scales:{
+        x:{display:false,grid:{display:false}},
+        y:{
+          ticks:{
+            color:"#000",
+            font:{family:"JetBrains Mono",size:10}
+          },
+          grid:{
+            color:"rgba(0,0,0,0.1)"
+          },
+          border:{color:"#000"}
+        }
+      }
+    }
+  });
+}
+
+/* MARKET LOOP */
+setInterval(()=>{
+  let sum=0;
+
+  assets.forEach(a=>{
+    const val=Math.random()*2;
+    document.getElementById(a).innerText=val.toFixed(4);
+    sum+=val;
+  });
+
+  const globalValue=(sum/assets.length)*100;
+  document.getElementById("liveGlobal").innerText="$"+globalValue.toFixed(2);
+
+  chartPoints.push(globalValue);
+  if(chartPoints.length>30) chartPoints.shift();
+
+  chart.data.labels=chartPoints.map((_,i)=>i);
+  chart.data.datasets[0].data=chartPoints;
+  chart.update();
+
+},1000);
+
+/* VIEW SWITCH */
+function switchView(view,el){
+  event.preventDefault();
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
+  if(view==="market")marketView.classList.add("active");
+  el.classList.add("active");
+}
+
+/* INIT */
+document.addEventListener("DOMContentLoaded",()=>{
+  initChart();
+});
+</script>
+</body>
+</html>
 </p>
 </div>
 
