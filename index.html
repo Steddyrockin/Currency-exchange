@@ -14,45 +14,67 @@
   --bg:#d4d4d4;
   --text:#000;
 }
+
 *{box-sizing:border-box;}
-body{margin:0;padding:40px;background:var(--bg);color:var(--text);font-family:"JetBrains Mono",monospace;}
-.container{max-width:1000px;margin:auto;}
-h1{font-size:28px;letter-spacing:2px;border-bottom:1px solid black;padding-bottom:10px;margin-bottom:30px;text-align:center;}
-
-.nav-links{display:flex;justify-content:center;gap:20px;margin-bottom:30px;flex-wrap:wrap;font-size:14px;}
-.nav-link{text-decoration:none;color:black;padding-bottom:4px;border-bottom:1px solid transparent;opacity:0.6;}
-.nav-link:hover{border-bottom:1px solid black;opacity:1;}
-.nav-link.active{border-bottom:1px solid black;font-weight:bold;opacity:1;}
-
-.panel{margin-top:30px;border:1px solid black;padding:25px;text-align:center;}
-.panel strong{display:block;margin-bottom:12px;}
-.blurb{font-size:14px;line-height:1.6;max-width:700px;margin:auto;}
-
-#trendChart{
-  width:100% !important;
-  max-height:260px;
-  margin-top:20px;
-}
-
-input, select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:1px solid black;
-  text-align:center;
+body{
+  margin:0;
+  padding:40px;
+  background:var(--bg);
+  color:var(--text);
   font-family:"JetBrains Mono", monospace;
-  font-size:14px;
-  background:black;
-  color:white;
 }
 
-.modal select {
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 30px;
-  cursor:pointer;
+.container{max-width:1000px;margin:auto;}
+
+h1{
+  font-size:28px;
+  letter-spacing:2px;
+  border-bottom:1px solid black;
+  padding-bottom:10px;
+  margin-bottom:30px;
+  text-align:center;
+}
+
+.nav-links{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.nav-link{
+  text-decoration:none;
+  color:black;
+  opacity:0.6;
+  border-bottom:1px solid transparent;
+}
+
+.nav-link.active{
+  opacity:1;
+  font-weight:bold;
+  border-bottom:1px solid black;
+}
+
+.panel{
+  margin-top:30px;
+  border:1px solid black;
+  padding:25px;
+  text-align:center;
+}
+
+#trendChart{max-height:260px;margin-top:20px;}
+
+table{
+  width:100%;
+  margin-top:30px;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid black;
+  text-align:center;
+  font-size:14px;
 }
 
 button{
@@ -64,38 +86,69 @@ button{
   border:1px solid black;
   cursor:pointer;
 }
-button:hover{background:white;color:black;}
-.apple-pay-btn{margin-top:10px;padding:14px;}
 
-table{width:100%;margin-top:30px;border-collapse:collapse;}
-th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14px;}
+button:hover{
+  background:white;
+  color:black;
+}
 
 .view{display:none;}
 .view.active{display:block;}
 
-.footer{margin-top:50px;padding-top:20px;border-top:1px solid black;display:flex;justify-content:center;gap:10px;font-size:12px;}
-.footer a{color:black;text-decoration:none;}
-.footer a:hover{text-decoration:underline;}
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:15px;
+  align-items:center;
+}
 
+.pagination button{
+  width:auto;
+  padding:8px 14px;
+}
+
+/* MODAL */
 .modal{
   position:fixed;
-  top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.6);
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.65);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:1000;
 }
+
 .modal-content{
-  background:#d4d4d4;
-  padding:30px;
+  background:var(--bg);
   border:1px solid black;
-  max-width:400px;
   width:100%;
+  max-width:420px;
+  padding:25px;
   text-align:center;
 }
-.secondary{background:white;color:black;}
-.secondary:hover{background:black;color:white;}
+
+.modal input,
+.modal select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:1px solid black;
+  background:black;
+  color:white;
+  text-align:center;
+}
+
+.secondary{
+  background:white;
+  color:black;
+}
+
+.secondary:hover{
+  background:black;
+  color:white;
+}
 </style>
 </head>
 
@@ -114,16 +167,7 @@ th,td{padding:14px;border-bottom:1px solid black;text-align:center;font-size:14p
 <div class="panel">
 <strong>GLOBAL DOLLAR</strong>
 <p id="liveGlobal">$0</p>
-
-<!-- ✅ TREND GRAPH ADDED -->
 <canvas id="trendChart"></canvas>
-</div>
-
-<div class="panel">
-<strong>AI MARKET SYSTEM</strong>
-<p class="blurb">
-Currency Exchange monitors global markets in real time and executes trades automatically.
-</p>
 </div>
 
 <table>
@@ -133,8 +177,12 @@ Currency Exchange monitors global markets in real time and executes trades autom
 <tbody id="tradeTable"></tbody>
 </table>
 
-<div class="panel"><strong>BALANCE</strong><p id="allocatedAmount">$0</p></div>
-<div class="panel"><strong>TOTAL EARNED</strong><p id="totalEarned">$0</p></div>
+<div class="pagination">
+<button onclick="prevPage()">Prev</button>
+<span id="pageInfo"></span>
+<button onclick="nextPage()">Next</button>
+</div>
+
 </div>
 
 <!-- TRANSACTIONS -->
@@ -148,185 +196,166 @@ Currency Exchange monitors global markets in real time and executes trades autom
 </table>
 </div>
 
-<!-- BANK PANEL -->
+<!-- BANK -->
 <div class="panel">
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
 <button onclick="openWithdrawModal()">Send</button>
-<button id="applePayBtn" class="apple-pay-btn">Pay with  Apple Pay</button>
+<button id="applePayBtn">Pay with  Apple Pay</button>
 </div>
 
-<!-- MODALS (unchanged) -->
+<!-- DEPOSIT MODAL -->
 <div id="depositModal" class="modal">
   <div class="modal-content">
-    <h2>Deposit</h2>
+    <h2>DEPOSIT</h2>
     <select id="currencySelect">
-      <option value="USD">USD – US Dollar</option>
-      <option value="EUR">EUR – Euro</option>
-      <option value="GBP">GBP – British Pound</option>
-      <option value="JPY">JPY – Japanese Yen</option>
-      <option value="AUD">AUD – Australian Dollar</option>
-      <option value="CAD">CAD – Canadian Dollar</option>
-      <option value="CHF">CHF – Swiss Franc</option>
+      <option>USD</option><option>EUR</option><option>GBP</option>
+      <option>JPY</option><option>AUD</option><option>CAD</option><option>CHF</option>
     </select>
-    <input type="number" id="fundInput" placeholder="Amount"/>
+    <input id="fundInput" type="number" placeholder="Amount"/>
     <button onclick="depositFunds()">Submit</button>
     <button class="secondary" onclick="closeDepositModal()">Cancel</button>
   </div>
 </div>
 
+<!-- WITHDRAW MODAL -->
 <div id="withdrawModal" class="modal">
   <div class="modal-content">
-    <h2>Send</h2>
+    <h2>SEND</h2>
+
     <select id="sendMethod" onchange="updateSendFields()">
-      <option value="bank">Bank Transfer</option>
+      <option value="bank">Bank</option>
       <option value="zelle">Zelle</option>
     </select>
 
     <div id="bankFields">
-      <input id="routingNumber" placeholder="Routing Number"/>
-      <input id="accountNumber" placeholder="Account Number"/>
+      <input id="routingNumber" placeholder="Routing"/>
+      <input id="accountNumber" placeholder="Account"/>
     </div>
 
     <div id="zelleFields" style="display:none;">
-      <input id="zelleEmail" placeholder="Zelle Email or Phone"/>
+      <input id="zelleEmail" placeholder="Zelle"/>
     </div>
 
     <input id="withdrawAmount" type="number" placeholder="Amount"/>
-    <button onclick="sendToBank()">Submit Transfer</button>
+
+    <button onclick="sendToBank()">Submit</button>
     <button class="secondary" onclick="closeWithdrawModal()">Cancel</button>
   </div>
 </div>
 
-<div class="footer">
-<span>© <span id="year"></span> Clean, Inc.</span>
-</div>
-
-</div>
-
 <script>
-const API="http://localhost:4000/api";
-const stripe=Stripe("pk_test_YOUR_PUBLIC_KEY");
+/* DATA */
+const assets=[
+"EURUSD","USDJPY","GBPUSD","USDCHF","AUDUSD","USDCAD","NZDUSD",
+"EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","EURNZD",
+"GBPJPY","GBPCHF","GBPAUD","GBPCAD",
+"AUDJPY","AUDNZD","AUDCAD",
+"CADJPY","CHFJPY","NZDJPY",
+"USDMXN","USDZAR","USDTRY","USDSEK","USDNOK",
+"USDHKD","USDSGD"
+];
 
-let assets=["EURUSD","USDJPY","GBPUSD"];
+const pageSize=10;
+let currentPage=1;
+let assetState={}, ledger=[], balance=0;
+let chart, chartPoints=[];
 
-let chart;
-let chartPoints = [];
-
-document.getElementById("year").innerText=new Date().getFullYear();
-
-/* INIT TABLE */
+/* INIT */
 assets.forEach(a=>{
-  const row=document.createElement("tr");
-  row.innerHTML=`<td>${a}</td><td id="${a}">--</td><td id="c${a}">-</td><td id="n${a}">-</td>`;
-  tradeTable.appendChild(row);
+  assetState[a]={value:Math.random()*2,change:0,pct:0};
 });
 
-/* INIT CHART */
+/* TABLE */
+function renderTable(){
+  const tbody=document.getElementById("tradeTable");
+  tbody.innerHTML="";
+
+  const start=(currentPage-1)*pageSize;
+  const page=assets.slice(start,start+pageSize);
+
+  page.forEach(a=>{
+    const d=assetState[a];
+    tbody.innerHTML+=`
+      <tr>
+        <td>${a}</td>
+        <td>${d.value.toFixed(4)}</td>
+        <td>${d.change}</td>
+        <td>${d.pct}%</td>
+      </tr>`;
+  });
+
+  document.getElementById("pageInfo").innerText=
+    `Page ${currentPage} / ${Math.ceil(assets.length/pageSize)}`;
+}
+
+/* PAGINATION */
+function nextPage(){if(currentPage<Math.ceil(assets.length/pageSize)){currentPage++;renderTable();}}
+function prevPage(){if(currentPage>1){currentPage--;renderTable();}}
+
+/* CHART */
 function initChart(){
   const ctx=document.getElementById("trendChart");
-
   chart=new Chart(ctx,{
     type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"Global Value",
-        data:[]
-      }]
-    },
-    options:{
-      responsive:true,
-      animation:false,
-      scales:{
-        x:{display:false}
-      }
-    }
+    data:{labels:[],datasets:[{data:[],borderColor:"#000",fill:true,pointRadius:0}]},
+    options:{animation:false,plugins:{legend:{display:false}},scales:{x:{display:false}}}
   });
 }
 
-/* CHART INIT (MATCHED DESIGN) */
-function initChart(){
-  const ctx=document.getElementById("trendChart");
-
-  chart=new Chart(ctx,{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        data:[],
-        borderColor:"#000",
-        backgroundColor:"rgba(0,0,0,0.05)",
-        borderWidth:1,
-        pointRadius:0,
-        tension:0,
-        fill:true
-      }]
-    },
-    options:{
-      responsive:true,
-      animation:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:"#000",
-          titleColor:"#fff",
-          bodyColor:"#fff",
-          borderColor:"#000",
-          borderWidth:1
-        }
-      },
-      scales:{
-        x:{display:false,grid:{display:false}},
-        y:{
-          ticks:{
-            color:"#000",
-            font:{family:"JetBrains Mono",size:10}
-          },
-          grid:{
-            color:"rgba(0,0,0,0.1)"
-          },
-          border:{color:"#000"}
-        }
-      }
-    }
-  });
-}
-
-/* MARKET LOOP */
+/* LOOP */
 setInterval(()=>{
   let sum=0;
 
   assets.forEach(a=>{
-    const val=Math.random()*2;
-    document.getElementById(a).innerText=val.toFixed(4);
-    sum+=val;
+    const d=(Math.random()*2-1)/100;
+    assetState[a].value+=d;
+    assetState[a].change=d.toFixed(4);
+    assetState[a].pct=(d*100).toFixed(2);
+    sum+=assetState[a].value;
   });
 
-  const globalValue=(sum/assets.length)*100;
+  const global=(sum/assets.length)*100;
+  document.getElementById("liveGlobal").innerText="$"+global.toFixed(2);
 
-  document.getElementById("liveGlobal").innerText="$"+globalValue.toFixed(2);
-
-  // update chart
-  const t=Date.now();
-
-  chartPoints.push(globalValue);
+  chartPoints.push(global);
   if(chartPoints.length>30) chartPoints.shift();
 
   chart.data.labels=chartPoints.map((_,i)=>i);
   chart.data.datasets[0].data=chartPoints;
   chart.update();
 
+  renderTable();
+
 },1000);
 
-/* VIEW SWITCH */
-function switchView(view,el){
-  event.preventDefault();
-  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-  document.querySelectorAll(".nav-link").forEach(l=>l.classList.remove("active"));
-  if(view==="market")marketView.classList.add("active");
-  if(view==="transactions"){transactionsView.classList.add("active");loadTransactions();}
-  el.classList.add("active");
+/* BANK */
+function depositFunds(){
+  const amt=parseFloat(document.getElementById("fundInput").value||0);
+  balance+=amt;
+  addTx("DEPOSIT",amt,"SUCCESS");
+  closeDepositModal();
+}
+
+function sendToBank(){
+  const amt=parseFloat(document.getElementById("withdrawAmount").value||0);
+  balance-=amt;
+  addTx("SEND",amt,"PENDING");
+  closeWithdrawModal();
+}
+
+function addTx(type,amount,status){
+  ledger.unshift({type,amount,status,time:new Date().toLocaleString()});
+  renderTx();
+}
+
+function renderTx(){
+  const t=document.getElementById("txTable");
+  if(!t) return;
+  t.innerHTML="";
+  ledger.forEach(x=>{
+    t.innerHTML+=`<tr><td>${x.type}</td><td>$${x.amount}</td><td>${x.status}</td><td>${x.time}</td></tr>`;
+  });
 }
 
 /* MODALS */
@@ -335,10 +364,25 @@ function closeDepositModal(){depositModal.style.display="none";}
 function openWithdrawModal(){withdrawModal.style.display="flex";}
 function closeWithdrawModal(){withdrawModal.style.display="none";}
 
+function updateSendFields(){
+  const m=sendMethod.value;
+  bankFields.style.display=m==="bank"?"block":"none";
+  zelleFields.style.display=m==="zelle"?"block":"none";
+}
+
+/* NAV */
+function switchView(v,el){
+  event.preventDefault();
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(x=>x.classList.remove("active"));
+  document.getElementById(v+"View").classList.add("active");
+  el.classList.add("active");
+}
+
 /* INIT */
 document.addEventListener("DOMContentLoaded",()=>{
   initChart();
-  setupApplePay();
+  renderTable();
 });
 </script>
 </body>
