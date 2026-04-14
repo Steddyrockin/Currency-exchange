@@ -134,6 +134,7 @@ Currency Exchange monitors global markets in real time and executes trades autom
 </table>
 
 <div class="panel"><strong>BALANCE</strong><p id="allocatedAmount">$0</p></div>
+<div class="panel"><strong>TOTAL EARNED</strong><p id="totalEarned">$0</p></div>
 </div>
 
 <!-- TRANSACTIONS -->
@@ -152,7 +153,7 @@ Currency Exchange monitors global markets in real time and executes trades autom
 <strong>BANK</strong>
 <button onclick="openDepositModal()">Deposit</button>
 <button onclick="openWithdrawModal()">Send</button>
-<button id="applePayBtn" class="apple-pay-btn">Pay</button>
+<button id="applePayBtn" class="apple-pay-btn">Pay with  Apple Pay</button>
 </div>
 
 <!-- MODALS (unchanged) -->
@@ -317,76 +318,6 @@ setInterval(()=>{
   chart.update();
 
 },1000);
-
-* ================= APPLE PAY ================= */
-function setupApplePay(){
-
-  const paymentRequest = stripe.paymentRequest({
-    country: 'US',
-    currency: 'usd',
-    total: {
-      label: 'Deposit',
-      amount: 1000
-    },
-    requestPayerName: true,
-    requestPayerEmail: true
-  });
-
-  const elements = stripe.elements();
-  const prButton = elements.create('paymentRequestButton', {
-    paymentRequest: paymentRequest
-  });
-
-  paymentRequest.canMakePayment().then(result => {
-    if (result && result.applePay) {
-      prButton.mount('#applePayBtn');
-    } else {
-      document.getElementById("applePayBtn").innerText="Apple Pay unavailable";
-    }
-  });
-
-  paymentRequest.on('paymentmethod', async (ev) => {
-
-    try{
-      const res = await fetch(`${API}/stripe/apple-pay`,{
-        method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          payment_method: ev.paymentMethod.id,
-          amount: 1000
-        })
-      });
-
-      const data = await res.json();
-
-      const {error} = await stripe.confirmCardPayment(
-        data.clientSecret,
-        {payment_method: ev.paymentMethod.id},
-        {handleActions:false}
-      );
-
-      if(error){
-        ev.complete('fail');
-      } else {
-        ev.complete('success');
-
-        // ✅ update UI balance
-        const current = parseFloat(
-          document.getElementById("liveGlobal").innerText.replace("$","")
-        );
-
-        document.getElementById("liveGlobal").innerText =
-          "$" + (current + 10).toFixed(2);
-
-        alert("Apple Pay successful");
-      }
-
-    }catch(e){
-      ev.complete('fail');
-    }
-
-  });
-}
 
 /* VIEW SWITCH */
 function switchView(view,el){
