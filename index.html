@@ -378,31 +378,7 @@ function switchView(v,el){
   document.querySelectorAll(".nav-link").forEach(x=>x.classList.remove("active"));
   if(v==="market")marketView.classList.add("active");
   if(v==="transactions")transactionsView.classList.add("active");
-  el.classList.add("active");
-}
-
-/* ================= INIT ================= */
-
-document.addEventListener("DOMContentLoaded",()=>{
-  renderTable();
-  initChart();
-});
-
-</script>
-/* MODALS */
-function openDepositModal(){depositModal.style.display="flex";}
-function closeDepositModal(){depositModal.style.display="none";}
-function openWithdrawModal(){withdrawModal.style.display="flex";}
-function closeWithdrawModal(){withdrawModal.style.display="none";}
-
-/* INIT */
-document.addEventListener("DOMContentLoaded",()=>{
-  initChart();
-  setupApplePay();
-});
-</script>
-</body>
-</html>
+  el.classList.add("active");}
 
 </body>
 </html>
