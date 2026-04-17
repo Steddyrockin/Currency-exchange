@@ -11,6 +11,19 @@
   color:#fff;
 }
 
+.footer{
+  margin-top:20px;
+  padding:15px;
+  border:1px solid black;
+  text-align:center;
+}
+
+.footer-inner{
+  letter-spacing:1px;
+  font-size:12px;
+  opacity:0.8;
+}
+
 .message.success{
   background:#fff;
   color:#000;
