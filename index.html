@@ -314,6 +314,48 @@ Currency Exchange monitors global markets in real time and executes trades autom
 </div>
 </div>
 
+<!-- FOOTER -->
+<div class="panel footer">
+  <div class="footer-links">
+    <a href="#" class="footer-link" onclick="openAboutModal()">ABOUT</a>
+    <a href="#" class="footer-link" onclick="openTermsModal()">TERMS</a>
+  </div>
+
+  <div class="footer-meta">
+    <span>© 2026 Clean Inc.</span>
+  </div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div id="aboutModal" class="modal">
+  <div class="modal-content">
+    <h2>ABOUT</h2>
+    <p>
+      Currency Exchange is a financial platform designed to provide real-time access
+      to global currency markets and asset movement under Clean Inc. (2026) systems infrastructure.
+    </p>
+    <p>
+      Clean Inc. develops autonomous financial systems focused on continuous value movement,
+      identity, and market connectivity.
+    </p>
+    <button onclick="closeAboutModal()">Close</button>
+  </div>
+</div>
+
+<!-- TERMS MODAL -->
+<div id="termsModal" class="modal">
+  <div class="modal-content">
+    <h2>TERMS OF SERVICE</h2>
+    <p>
+      Users are responsible for all financial actions executed through the platform.
+    </p>
+    <p>
+      Currency Exchange does not guarantee outcomes or returns and operates under market risk conditions.
+    </p>
+    <button onclick="closeTermsModal()">Close</button>
+  </div>
+</div>
+
 <script>
 const assets=["EURUSD","USDJPY","GBPUSD","USDCHF","AUDUSD","USDCAD","NZDUSD","EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","EURNZD","GBPJPY","GBPCHF","GBPAUD","GBPCAD","AUDJPY","AUDNZD","AUDCAD","CADJPY","CHFJPY","NZDJPY","USDMXN","USDZAR","USDTRY","USDSEK","USDNOK","USDHKD","USDSGD"];
 
