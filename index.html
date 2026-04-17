@@ -314,6 +314,58 @@ Currency Exchange monitors global markets in real time and executes trades autom
 </div>
 </div>
 
+<!-- FOOTER -->
+<div class="panel" style="margin-top:30px;">
+  <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+    <a href="#" onclick="openAboutModal()">About</a>
+    <a href="#" onclick="openTermsModal()">Terms of Service</a>
+  </div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div id="aboutModal" class="modal">
+  <div class="modal-content">
+    <h2>ABOUT</h2>
+    <p>
+      Currency Exchange is a financial platform designed to provide real-time access
+      to global currency markets and asset movement.
+    </p>
+    <p>
+      The system integrates live data, automated trading infrastructure, and user-controlled
+      capital flows into a unified interface for managing and interacting with digital finance.
+    </p>
+    <p>
+      Our goal is to enable continuous, seamless participation in global markets through
+      modern technology and intelligent systems.
+    </p>
+    <button onclick="closeAboutModal()">Close</button>
+  </div>
+</div>
+
+<!-- TERMS MODAL -->
+<div id="termsModal" class="modal">
+  <div class="modal-content">
+    <h2>TERMS OF SERVICE</h2>
+    <p>
+      By accessing and using Currency Exchange, you agree to comply with all applicable laws
+      and regulations governing financial activity in your jurisdiction.
+    </p>
+    <p>
+      Users are solely responsible for all transactions, integrations, and financial decisions
+      made through the platform.
+    </p>
+    <p>
+      Currency Exchange does not guarantee financial returns or outcomes. Market conditions
+      are inherently volatile and subject to change.
+    </p>
+    <p>
+      The platform is provided on an "as-is" and "as-available" basis without warranties
+      of any kind, express or implied.
+    </p>
+    <button onclick="closeTermsModal()">Close</button>
+  </div>
+</div>
+
 <script>
 const assets=["EURUSD","USDJPY","GBPUSD","USDCHF","AUDUSD","USDCAD","NZDUSD","EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","EURNZD","GBPJPY","GBPCHF","GBPAUD","GBPCAD","AUDJPY","AUDNZD","AUDCAD","CADJPY","CHFJPY","NZDJPY","USDMXN","USDZAR","USDTRY","USDSEK","USDNOK","USDHKD","USDSGD"];
 
